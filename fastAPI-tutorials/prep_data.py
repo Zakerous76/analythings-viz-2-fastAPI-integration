@@ -1,4 +1,5 @@
 import pandas as pd
+pd.set_option('future.no_silent_downcasting', True)
 
 def sales_by_cities(start_year=2013, end_year=2024):
     """
@@ -25,5 +26,19 @@ def sales_by_cities(start_year=2013, end_year=2024):
     df_totals_total = df_totals[["Yıl/Ay", "Total"]]
     df_totals_cities = df_totals.drop(columns=["Total", "Yıl", "Ay"])
     df_totals_total_granular = df[breakpoint_index:]
-    df_totals_total_granular = df_totals_total_granular[df_totals_total_granular.index.year <= start_year and df_totals_total_granular.index.year >= end_year]
+
+    # Aggregating Yıl and AY
+    month_mapping = {
+        'Ocak': 1, 'Şubat': 2, 'Mart': 3, 'Nisan': 4, 'Mayıs': 5, 'Haziran': 6,
+        'Temmuz': 7, 'Ağustos': 8, 'Eylül': 9, 'Ekim': 10, 'Kasım': 11, 'Aralık': 12
+    }
+
+    # Convert 'Yıl' and 'Ay' to datetime format
+    df_totals_total_granular['Tarih'] = df_totals_total_granular.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay'].split(" - ")[0]], 1), axis=1)
+    df_totals_total_granular.drop(columns=['Yıl', 'Ay'], inplace=True)
+    df_totals_total_granular.set_index("Tarih", inplace=True)
+    df_totals_total_granular.sort_values(by='Tarih', inplace=True)
+
+    df_totals_total_granular = df_totals_total_granular[df_totals_total_granular.index.year <= end_year]
+    df_totals_total_granular = df_totals_total_granular[df_totals_total_granular.index.year >= start_year]
     return df_totals_total, df_totals_cities, df_totals_total_granular

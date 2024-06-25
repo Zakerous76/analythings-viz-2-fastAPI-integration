@@ -1,23 +1,23 @@
 import plotly.graph_objs as go
 import pandas as pd
 
-def animate(df_granular):
+def animate(df_totals_total_granular):
 
-    # df_granular is your DataFrame and has the necessary data
+    # df_totals_total_granular is your DataFrame and has the necessary data
     # Calculate the min and max values for the x and y axis
-    x_min = df_granular.index.min() - pd.Timedelta(days=2)
-    x_max = df_granular.index.max() + pd.Timedelta(days=20)
+    x_min = df_totals_total_granular.index.min() - pd.Timedelta(days=2)
+    x_max = df_totals_total_granular.index.max() + pd.Timedelta(days=20)
     y_min = 0
-    y_max = df_granular['Total'].max()*1.2
+    y_max = df_totals_total_granular['Total'].max()*1.2
 
     # Create figure
     fig = go.Figure(layout=dict(height=800, width=1800))
 
     # Initial empty plot
-    fig.add_trace(go.Scatter(x=df_granular.index, y=[None]*len(df_granular), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='İllere Göre Toplam Konut Satış (2013-2024)'))
+    fig.add_trace(go.Scatter(x=df_totals_total_granular.index, y=[None]*len(df_totals_total_granular), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='İllere Göre Toplam Konut Satış (2013-2024)'))
 
     # Define frames for animation
-    frames = [go.Frame(data=[go.Scatter(x=df_granular.index[:k+1], y=df_granular['Total'][:k+1])], name=str(k)) for k in range(len(df_granular))]
+    frames = [go.Frame(data=[go.Scatter(x=df_totals_total_granular.index[:k+1], y=df_totals_total_granular['Total'][:k+1])], name=str(k)) for k in range(len(df_totals_total_granular))]
 
     fig.frames = frames
 
@@ -77,7 +77,7 @@ def animate(df_granular):
             'y': 0,
             'steps': [{'args': [[str(k)], {'frame': {'duration': 50, 'redraw': True}, 'mode': 'immediate'}],
                     'label': str(k),
-                    'method': 'animate'} for k in range(len(df_granular))]
+                    'method': 'animate'} for k in range(len(df_totals_total_granular))]
         }]
     )
 
