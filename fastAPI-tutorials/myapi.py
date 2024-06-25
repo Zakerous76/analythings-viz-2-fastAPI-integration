@@ -46,11 +46,6 @@ async def get_total_sales():
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 
-@app.get("/total_sales_animate")
-async def get_total_sales_animate():
-    fig = animate(df_totals_total_granular)
-    graph_html = pio.to_html(fig, full_html=False)
-    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 # TODO: Fix this
 @app.get("/sales_by_cities")
@@ -67,5 +62,51 @@ async def get_sales_by_cities_animate():
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
+
+# ------------------------------------------------------------------------------------------------
+# Dashboard Visualizations
+@app.get("/total_sales_animate")
+async def get_total_sales_animate():
+    fig = animate(df_totals_total_granular)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
+
+@app.get("/total_sales_to_foreigners_animate")
+async def get_total_sales_to_foreigners_animate():
+    pass
+
+@app.get("/population_map") # with gender
+async def get_population_map():
+    pass
+
+@app.get("/sales_per_city/{city_name}")
+async def get_sales_per_city(city_name):
+    pass
+
+@app.get("/sales_all_cities")
+async def get_sales_all_cities():
+    pass
+
+@app.get("/sales_foreigners_per_city</{city_name}") # if city name not in list, return for others
+async def get_sales_foreigners_per_city(city_name):
+    pass
+
+@app.get("/sales_foreigners_all_cities")
+async def get_foreigners_sales_all_cities():
+    pass
+
+
+# ------------------------------------------------------------------------------------------------
+# Report
+
+# TODO: population by age group
+# TODO: population by gender
+# TODO: population of foreigners
+# TODO: population by marital status
+# TODO: Yaş Grubu ve Cinsiyete Göre İl/İlçe Merkezi ve Belde / Köy Nüfusu
+# TODO: Education Level
+
+
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
