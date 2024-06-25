@@ -1,7 +1,7 @@
 import plotly.graph_objs as go
 import pandas as pd
 
-def animate(df_totals_total_granular):
+def total_sales_animate(df_totals_total_granular):
 
     # df_totals_total_granular is your DataFrame and has the necessary data
     # Calculate the min and max values for the x and y axis

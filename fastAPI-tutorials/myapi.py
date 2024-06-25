@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 import uvicorn
 from prep_data import sales_by_cities
-from plot import animate
+from plot import total_sales_animate
 import plotly.io as pio
 import plotly.graph_objs as go
 
@@ -58,7 +58,7 @@ async def get_sales_by_cities():
 # TODO: Fix this
 @app.get("/sales_by_cities_animate")
 async def get_sales_by_cities_animate():
-    fig = animate(df_totals_total_granular)
+    fig = total_sales_animate(df_totals_total_granular)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
@@ -67,7 +67,7 @@ async def get_sales_by_cities_animate():
 # Dashboard Visualizations
 @app.get("/total_sales_animate")
 async def get_total_sales_animate():
-    fig = animate(df_totals_total_granular)
+    fig = total_sales_animate(df_totals_total_granular)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
