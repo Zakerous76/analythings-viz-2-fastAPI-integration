@@ -5,7 +5,7 @@ pd.set_option('future.no_silent_downcasting', True)
 
 def sales_by_cities(start_year=2013, end_year=2024):
     """
-        This function returns the number of real estates sold according to cities (İl)
+        This function returns the number of real estates sold according in each city (İl)
 
         params:
             start_year (int): the starting year for the total number of real estates sold in the country
@@ -55,3 +55,54 @@ def sales_by_cities(start_year=2013, end_year=2024):
     df_granular_cities = df_granular.drop("Total", axis=1)
 
     return df_totals_total, df_totals_cities, df_granular, df_granular_cities
+
+
+def sales_by_cities_foreigners(start_year=2013, end_year=2024):
+    """
+        This function returns the number of real estates sold to foreigners in each city (İl)
+
+        params:
+            start_year (int): the starting year for the total number of sales in the country
+            end_year (int): the ending year for the total number of sales in the country
+
+        returns:
+            df_totals_total (pandas_df): Total number of real estates sold in the country
+            df_totals_cities (pandas_df): Total number of real estates sold in each city
+            df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
+                in each month (monthly granularity)
+            df_granular_cities (pandas_df): df_granular without the "Total" column 
+    """
+
+    df_f = pd.read_excel("./datasets/İllere göre yabancılara satış sayısı.xls")
+    df_f.rename(columns={'Unnamed: 1': 'Şehir'}, inplace=True)
+    df_f_total = df_f.dropna().drop(["Şehir", "Toplam"], axis=1)
+    df_f_total["Yıl"] = df_f_total["Yıl"].astype(int)
+    df_f = df_f.ffill().drop("Toplam", axis=1)
+    df_f["Yıl"] = df_f["Yıl"].astype(int)
+
+    df_long = df_f_total.melt(id_vars=['Yıl'], var_name='Ay', value_name='Sayı')
+    df_f_total_aggregated = df_long.groupby(['Yıl', 'Ay']).sum().reset_index()
+    month_mapping = {
+        'Ocak': 1, 'Şubat': 2, 'Mart': 3, 'Nisan': 4, 'Mayıs': 5, 'Haziran': 6,
+        'Temmuz': 7, 'Ağustos': 8, 'Eylül': 9, 'Ekim': 10, 'Kasım': 11, 'Aralık': 12
+    }
+    df_f_total_aggregated['Tarih'] = df_f_total_aggregated.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay']], 1), axis=1)
+    df_f_total_aggregated.drop(columns=['Yıl', 'Ay'], inplace=True)
+    df_f_total_aggregated = df_f_total_aggregated.sort_values(by='Tarih')
+    df_f_total_aggregated.set_index("Tarih", inplace=True)
+    df_f_total_aggregated["Sayı"] = df_f_total_aggregated["Sayı"].astype(int)
+
+    df_f_cities = df_f[df_f['Şehir'] != "Toplam - Total"]
+    df_long = df_f_cities.melt(id_vars=['Yıl', 'Şehir'], var_name='Ay', value_name='Sayı')
+    df_f_cities_aggregated = df_long.groupby(['Yıl', 'Şehir', 'Ay']).sum().reset_index()
+    df_f_cities_aggregated['Tarih'] = df_f_cities_aggregated.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay']], 1), axis=1)
+    df_f_cities_aggregated.drop(columns=['Yıl', 'Ay'], inplace=True)
+    df_f_cities_aggregated = df_f_cities_aggregated.sort_values(by='Tarih')
+    df_f_cities_aggregated.set_index("Tarih", inplace=True)
+    df_f_cities_aggregated["Sayı"] = df_f_cities_aggregated["Sayı"].astype(int)
+
+    df_f_total_aggregated = df_f_total_aggregated[(df_f_total_aggregated.index.year <= end_year) & (df_f_total_aggregated.index.year >= start_year)]
+    df_f_cities_aggregated = df_f_cities_aggregated[(df_f_cities_aggregated.index.year <= end_year) & (df_f_cities_aggregated.index.year >= start_year)]
+
+
+    return df_f_total_aggregated, df_f_cities_aggregated
