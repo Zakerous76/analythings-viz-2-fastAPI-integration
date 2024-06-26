@@ -2,12 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 import uvicorn
 from prep_data import sales_by_cities
-from plot import total_sales_animate
+from plot import *
 import plotly.io as pio
 import plotly.graph_objs as go
 
 app = FastAPI()
-df_totals_total, df_totals_cities, df_totals_total_granular = sales_by_cities() 
+df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_by_cities() 
+# df_totals_total_granular = sales_by_cities() 
 
 def create_html_button(label, link):
     return f'<button onclick="window.location.href=\'{link}\'">{label}</button>'
@@ -37,37 +38,38 @@ async def get_home():
     ]
     return HTMLResponse(content=html_content.format(buttons=" ".join(buttons)))
 
-# TODO: Fix this
+
 @app.get("/total_sales")
 async def get_total_sales():
-    fig = go.Figure(data=go.Bar(x=df_totals_total['Yıl/Ay'], y=df_totals_total['Total']))
-    fig.update_layout(title="Total Sales by Year/Month", xaxis_title="Year/Month", yaxis_title="Total Sales")
+    fig = total_sales_plot(df_granular)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
-
-
-# TODO: Fix this
-@app.get("/sales_by_cities")
-async def get_sales_by_cities():
-    fig = go.Figure(data=[go.Bar(name=city, x=df_totals_total['Yıl/Ay'], y=df_totals_cities[city]) for city in df_totals_cities.columns])
-    fig.update_layout(title="Sales by Cities", xaxis_title="Year/Month", yaxis_title="Total Sales", barmode='stack')
+@app.get("/total_sales_yearly/{city}") # city is optional
+async def get_total_sales_yearly(city):
+    fig = total_sales_yearly_plot(df_totals_cities)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
-# TODO: Fix this
-@app.get("/sales_by_cities_animate")
-async def get_sales_by_cities_animate():
-    fig = total_sales_animate(df_totals_total_granular)
+@app.get("/total_sales_monthly/{city}") # city is optional
+async def get_total_sales_yearly(city):
+    fig = total_sales_monthly_plot(df_granular_cities)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
+
+# # TODO: Fix this
+# @app.get("/sales_by_cities_animate")
+# async def get_sales_by_cities_animate():
+#     fig = total_sales_animate(df_granular)
+#     graph_html = pio.to_html(fig, full_html=False)
+#     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 
 # ------------------------------------------------------------------------------------------------
 # Dashboard Visualizations
 @app.get("/total_sales_animate")
 async def get_total_sales_animate():
-    fig = total_sales_animate(df_totals_total_granular)
+    fig = total_sales_animate(df_granular)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
@@ -93,6 +95,7 @@ async def get_sales_foreigners_per_city(city_name):
 
 @app.get("/sales_foreigners_all_cities")
 async def get_foreigners_sales_all_cities():
+    pass
     pass
 
 
