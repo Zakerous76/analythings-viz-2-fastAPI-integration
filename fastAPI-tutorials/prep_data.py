@@ -81,7 +81,7 @@ def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
     df_f["Yıl"] = df_f["Yıl"].ffill().astype(int)
     df_f.drop("Toplam", axis=1, inplace=True)
 
-    df_long = df_f_total.melt(id_vars=['Yıl'], var_name='Ay', value_name='Toplam')
+    df_long = df_f_total.melt(id_vars=['Yıl'], var_name='Ay', value_name='Total')
     df_f_total_aggregated = df_long.groupby(['Yıl', 'Ay']).sum().reset_index()
     month_mapping = {
         'Ocak': 1, 'Şubat': 2, 'Mart': 3, 'Nisan': 4, 'Mayıs': 5, 'Haziran': 6,
@@ -91,21 +91,22 @@ def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
     df_f_total_aggregated.drop(columns=['Yıl', 'Ay'], inplace=True)
     df_f_total_aggregated = df_f_total_aggregated.sort_values(by='Tarih')
     df_f_total_aggregated.set_index("Tarih", inplace=True)
-    df_f_total_aggregated["Toplam"] = df_f_total_aggregated["Toplam"].astype(int)
+    df_f_total_aggregated["Total"] = df_f_total_aggregated["Total"].astype(int)
 
     df_f_cities = df_f[df_f['Şehir'] != "Toplam - Total"]
-    df_long = df_f_cities.melt(id_vars=['Yıl', 'Şehir'], var_name='Ay', value_name='Toplam')
+    df_long = df_f_cities.melt(id_vars=['Yıl', 'Şehir'], var_name='Ay', value_name='Total')
     df_f_cities_aggregated = df_long.groupby(['Yıl', 'Şehir', 'Ay']).sum().reset_index()
     df_f_cities_aggregated['Tarih'] = df_f_cities_aggregated.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay']], 1), axis=1)
     df_f_cities_aggregated.drop(columns=['Yıl', 'Ay'], inplace=True)
     df_f_cities_aggregated = df_f_cities_aggregated.sort_values(by='Tarih')
     df_f_cities_aggregated.set_index("Tarih", inplace=True)
-    df_f_cities_aggregated["Toplam"] = df_f_cities_aggregated["Toplam"].astype(int)
+    df_f_cities_aggregated["Total"] = df_f_cities_aggregated["Total"].astype(int)
 
     df_f_total_aggregated = df_f_total_aggregated[(df_f_total_aggregated.index.year <= end_year) & (df_f_total_aggregated.index.year >= start_year)]
-    df_f_total_aggregated = df_f_total_aggregated[df_f_total_aggregated['Toplam'] != 0]
+    df_f_total_aggregated = df_f_total_aggregated[df_f_total_aggregated['Total'] != 0]
 
     df_f_cities_aggregated = df_f_cities_aggregated[(df_f_cities_aggregated.index.year <= end_year) & (df_f_cities_aggregated.index.year >= start_year)]
+    df_f_cities_aggregated = df_f_cities_aggregated[df_f_cities_aggregated['Total'] != 0]
 
 
     return df_f_total_aggregated, df_f_cities_aggregated

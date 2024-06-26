@@ -149,24 +149,23 @@ def total_sales_monthly_plot(df_granular_cities, city=None):
     return fig
 
 
-
-def total_sales_to_foreigners_animate(df_f_total_aggregated):
+def total_sales_foreigners_animate(df_f_total_aggregated):
 
     # df_F_total_aggregated is your DataFrame and has the necessary data
     # Calculate the min and max values for the x and y axis
-    x_min = df_F_total_aggregated.index.min() - pd.Timedelta(days=2)
-    x_max = df_F_total_aggregated.index.max() + pd.Timedelta(days=20)
+    x_min = df_f_total_aggregated.index.min() - pd.Timedelta(days=2)
+    x_max = df_f_total_aggregated.index.max() + pd.Timedelta(days=20)
     y_min = 0
-    y_max = df_F_total_aggregated['Toplam'].max()*1.2
+    y_max = df_f_total_aggregated['Total'].max()*1.2
 
     # Create figure
     fig = go.Figure(layout=dict(height=800, width=1800))
 
     # Initial empty plot
-    fig.add_trace(go.Scatter(x=df_F_total_aggregated.index, y=[None]*len(df_F_total_aggregated), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Yabancılara Toplam Konut Satış'))
+    fig.add_trace(go.Scatter(x=df_f_total_aggregated.index, y=[None]*len(df_f_total_aggregated), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Yabancılara Toplam Konut Satış'))
 
     # Define frames for animation
-    frames = [go.Frame(data=[go.Scatter(x=df_F_total_aggregated.index[:k+1], y=df_F_total_aggregated['Toplam'][:k+1])], name=str(k)) for k in range(len(df_F_total_aggregated))]
+    frames = [go.Frame(data=[go.Scatter(x=df_f_total_aggregated.index[:k+1], y=df_f_total_aggregated['Total'][:k+1])], name=str(k)) for k in range(len(df_f_total_aggregated))]
 
     fig.frames = frames
 
@@ -198,7 +197,7 @@ def total_sales_to_foreigners_animate(df_f_total_aggregated):
 
     # Update layout with buttons and animation settings
     fig.update_layout(
-        title=f'Ülkede Yabancılara Toplam Konut Satış ({df_F_total_aggregated.index.min().year}-{df_F_total_aggregated.index.max().year})',
+        title=f'Ülkede Yabancılara Toplam Konut Satış ({df_f_total_aggregated.index.min().year}-{df_f_total_aggregated.index.max().year})',
         xaxis_title='Tarih',
         yaxis_title='Toplam',
         title_font=dict(size=30, family="Roboto"),
@@ -226,10 +225,58 @@ def total_sales_to_foreigners_animate(df_f_total_aggregated):
             'y': 0,
             'steps': [{'args': [[str(k)], {'frame': {'duration': 50, 'redraw': True}, 'mode': 'immediate'}],
                     'label': str(k),
-                    'method': 'animate'} for k in range(len(df_F_total_aggregated))]
+                    'method': 'animate'} for k in range(len(df_f_total_aggregated))]
         }]
     )
 
+    return fig
+
+def total_sales_foreigners_plot(df_f_total_aggregated):
+
+    # Calculate the min and max values for the x and y axis
+    x_min = df_f_total_aggregated.index.min() - pd.Timedelta(days=2)
+    x_max = df_f_total_aggregated.index.max() + pd.Timedelta(days=20)
+    
+    y_min = 0
+    y_max = df_f_total_aggregated['Total'].max()*1.2
+
+    # Create figure
+    fig = go.Figure(layout=dict(height=800, width=1800))
+
+    # Initial empty plot
+    fig.add_trace(go.Scatter(x=df_f_total_aggregated.index, y=df_f_total_aggregated["Total"], mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Yabancılara Toplam Konut Satış'))
+
+    # Update layout with buttons and animation settings
+    fig.update_layout(
+        title=f'Ülkede Yabancılara Toplam Konut Satış ({df_f_total_aggregated.index.min().year}-{df_f_total_aggregated.index.max().year})',
+        xaxis_title='Tarih',
+        yaxis_title='Toplam',
+        title_font=dict(size=30, family="Roboto"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family="Roboto", size=12), showgrid=True, range=[x_min, x_max]),
+        yaxis=dict(tickfont=dict(family="Roboto", size=12), tickformat=',', showgrid=True, range=[y_min, y_max]),
+        margin=dict(l=110, r=20, t=100, b=110),
+        hovermode='x',
+        legend=dict(font=dict(family="Roboto", size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
+        xaxis_title_font=dict(size=20, family="Roboto", color='black', weight='bold'),
+        yaxis_title_font=dict(size=20, color='black', weight='bold'),
+    )
+
+    return fig
+
+def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city=None):
+    """
+        City must be spelled properly
+    """
+    if city == None:
+        fig = px.line(df_f_cities_aggregated, x=df_f_cities_aggregated.index, 
+                      y='Total', color='Şehir', title='Real Estate Sold Over Time',
+                      )
+    else:
+        city = city.capitalize()
+        dff = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city]
+        fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title='Real Estate Sold Over Time',
+                     color_discrete_sequence=px.colors.qualitative.Vivid)
+    fig.update_layout(width=1800, height=800)
     return fig
 
 

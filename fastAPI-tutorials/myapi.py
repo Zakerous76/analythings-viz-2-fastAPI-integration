@@ -46,15 +46,21 @@ async def get_total_sales():
     graph_html = pio.to_html(fig, full_html=False) # will return a single <div> element
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
-@app.get("/total_sales_yearly/{city}") # city is optional
-async def get_total_sales_yearly(city):
-    fig = total_sales_yearly_plot(df_totals_cities)
+@app.get("/total_sales_animate")
+async def get_total_sales_animate():
+    fig = total_sales_animate(df_granular)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
-@app.get("/total_sales_monthly/{city}") # city is optional
-async def get_total_sales_yearly(city):
-    fig = total_sales_monthly_plot(df_granular_cities)
+@app.get("/total_sales_yearly/{city_name}") # city_name is optional. if not provided, will return for all cities
+async def get_total_sales_yearly(city_name):
+    fig = total_sales_yearly_plot(df_totals_cities, city_name)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
+
+@app.get("/total_sales_monthly/{city_name}") # city_name is optional. if not provided, will return for all cities
+async def get_total_sales_yearly(city_name):
+    fig = total_sales_monthly_plot(df_granular_cities, city_name)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
@@ -68,37 +74,22 @@ async def get_total_sales_yearly(city):
 
 # ------------------------------------------------------------------------------------------------
 # Dashboard Visualizations
-@app.get("/total_sales_animate")
-async def get_total_sales_animate():
-    fig = total_sales_animate(df_granular)
-    graph_html = pio.to_html(fig, full_html=False)
-    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 @app.get("/total_sales_to_foreigners_animate")
 async def get_total_sales_to_foreigners_animate():
-    fig = total_sales_to_foreigners_animate(df_f_total_aggregated)
+    fig = total_sales_foreigners_animate(df_f_total_aggregated)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
+
+
+@app.get("/total_sales_monthly_foreigners/{city_name}") # if city name not in list, return for others
+async def get_total_sales_monthly_foreigners(city_name):
+    fig = total_sales_monthly_foreigners_plot(df_f_total_aggregated, city_name)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 @app.get("/population_map") # with gender
 async def get_population_map():
-    pass
-
-@app.get("/sales_per_city/{city_name}")
-async def get_sales_per_city(city_name):
-    pass
-
-@app.get("/sales_all_cities")
-async def get_sales_all_cities():
-    pass
-
-@app.get("/sales_foreigners_per_city</{city_name}") # if city name not in list, return for others
-async def get_sales_foreigners_per_city(city_name):
-    pass
-
-@app.get("/sales_foreigners_all_cities")
-async def get_foreigners_sales_all_cities():
-    pass
     pass
 
 
