@@ -43,7 +43,7 @@ async def get_home():
 @app.get("/total_sales")
 async def get_total_sales():
     fig = total_sales_plot(df_granular)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(fig, full_html=False) # will return a single <div> element
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 @app.get("/total_sales_yearly/{city}") # city is optional
@@ -76,7 +76,9 @@ async def get_total_sales_animate():
 
 @app.get("/total_sales_to_foreigners_animate")
 async def get_total_sales_to_foreigners_animate():
-    pass
+    fig = total_sales_to_foreigners_animate(df_f_total_aggregated)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 @app.get("/population_map") # with gender
 async def get_population_map():

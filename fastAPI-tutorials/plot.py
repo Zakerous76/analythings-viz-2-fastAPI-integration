@@ -150,7 +150,7 @@ def total_sales_monthly_plot(df_granular_cities, city=None):
 
 
 
-def total_sales_to_foreigners_animate(df_F_total_aggregated):
+def total_sales_to_foreigners_animate(df_f_total_aggregated):
 
     # df_F_total_aggregated is your DataFrame and has the necessary data
     # Calculate the min and max values for the x and y axis
