@@ -1,14 +1,15 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 import uvicorn
-from prep_data import sales_by_cities
+from prep_data import *
 from plot import *
 import plotly.io as pio
 import plotly.graph_objs as go
 
 app = FastAPI()
-df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_by_cities() 
-# df_totals_total_granular = sales_by_cities() 
+df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_by_cities_df() 
+df_f_total_aggregated, df_f_cities_aggregated = sales_by_cities_foreigners_df()
+
 
 def create_html_button(label, link):
     return f'<button onclick="window.location.href=\'{link}\'">{label}</button>'
