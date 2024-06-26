@@ -19,7 +19,7 @@ def sales_by_cities(start_year=2013, end_year=2024):
             df_granular_cities (pandas_df): df_granular without the "Total" column 
     """
 
-    df = pd.read_excel("./datasets/İllere göre satış sayısı.xls")
+    df = pd.read_excel("./datasets/İllere göre konut satış sayısı.xls")
     df.rename(columns={df.columns[0]: "Yıl", df.columns[1]: "Ay", df.columns[2]: "Total"}, inplace=True)
     df.ffill(inplace=True)
     df['Yıl'] = df['Yıl'].astype(int)
@@ -73,7 +73,7 @@ def sales_by_cities_foreigners(start_year=2013, end_year=2024):
             df_granular_cities (pandas_df): df_granular without the "Total" column 
     """
 
-    df_f = pd.read_excel("./datasets/İllere göre yabancılara satış sayısı.xls")
+    df_f = pd.read_excel("./datasets/İllere göre yabancılara konut satış sayısı.xls")
     df_f.rename(columns={'Unnamed: 1': 'Şehir'}, inplace=True)
     df_f_total = df_f.dropna().drop(["Şehir", "Toplam"], axis=1)
     df_f_total["Yıl"] = df_f_total["Yıl"].astype(int)
