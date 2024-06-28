@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Path
 from fastapi.responses import HTMLResponse
 import uvicorn
 from prep_data import *
@@ -9,7 +9,7 @@ import plotly.graph_objs as go
 app = FastAPI()
 df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_by_cities_df() 
 df_f_total_aggregated, df_f_cities_aggregated = sales_by_cities_foreigners_df()
-
+df_p = population_df()
 
 def create_html_button(label, link):
     return f'<button onclick="window.location.href=\'{link}\'">{label}</button>'
@@ -52,14 +52,14 @@ async def get_total_sales_animate():
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
-@app.get("/total_sales_yearly/{city_name}") # city_name is optional. if not provided, will return for all cities
-async def get_total_sales_yearly(city_name):
+@app.get("/total_sales_yearly/") # city_name is optional. if not provided, will return for all cities
+async def get_total_sales_yearly(city_name: str = None):
     fig = total_sales_yearly_plot(df_totals_cities, city_name)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 @app.get("/total_sales_monthly/{city_name}") # city_name is optional. if not provided, will return for all cities
-async def get_total_sales_yearly(city_name):
+async def get_total_sales_yearly(city_name: str = None):
     fig = total_sales_monthly_plot(df_granular_cities, city_name)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
@@ -82,11 +82,18 @@ async def get_total_sales_to_foreigners_animate():
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
 
-@app.get("/total_sales_monthly_foreigners/{city_name}") # if city name not in list, return for others
-async def get_total_sales_monthly_foreigners(city_name):
+@app.get("/total_sales_monthly_foreigners/") # if city name not in list, return for others
+async def get_total_sales_monthly_foreigners(city_name: str = None):
     fig = total_sales_monthly_foreigners_plot(df_f_total_aggregated, city_name)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
+
+@app.get("/population_plot") # with gender
+async def get_population_plot(city_code: int = 0):
+    fig = population_plot(df_p, city_code)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
+
 
 @app.get("/population_map") # with gender
 async def get_population_map():

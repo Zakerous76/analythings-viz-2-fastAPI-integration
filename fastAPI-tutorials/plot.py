@@ -1,5 +1,6 @@
 import plotly.graph_objs as go
 import plotly.express as px
+from plotly.subplots import make_subplots
 import pandas as pd
 
 def total_sales_animate(df_granular):
@@ -132,6 +133,7 @@ def total_sales_yearly_plot(df_totals_cities, city=None):
         fig.update_xaxes(tickmode='linear') 
     return fig
 
+# city => cities
 def total_sales_monthly_plot(df_granular_cities, city=None):
     """
         City must be spelled properly
@@ -280,6 +282,89 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city=None):
     return fig
 
 
+def population_map():
+    pass
+
+def population_plot(df_p, city_code=0):
+    # Create the figure with subplots
+    fig = make_subplots(rows=1, cols=3, specs=[[{'type': 'pie'}, {'type': 'pie'}, {'type': 'pie'}]], subplot_titles=(df_p.iloc[city_code, 0].capitalize(), "İl ve İlçe Merkezleri", "Belde ve Köyler"))
+
+    # Define the data for each pie chart
+    values1 = [df_p.iloc[city_code, 2], df_p.iloc[city_code, 3]]
+    values2 = [df_p.iloc[city_code, 5], df_p.iloc[city_code, 6]]
+    values3 = [df_p.iloc[city_code, 8], df_p.iloc[city_code, 9]]
+    labels = ['Erkek', 'Kadın']
+    colors = ['skyblue', 'salmon']
+
+    # Add the first pie chart
+    fig.add_trace(go.Pie(
+        name="",
+        labels=labels,
+        values=values1,
+        marker=dict(colors=colors),
+        hovertemplate='<b>%{label}</b><br>%{value}',
+        pull=[0, 0],
+        textfont=dict(size=16, family="Balto", color="black"),  # Adjust text size and color
+        textinfo='label+percent',  # Show labels and percentages
+    ), row=1, col=1)
+
+    # Add the second pie chart
+    fig.add_trace(go.Pie(
+        name="",
+        labels=labels,
+        values=values2,
+        marker=dict(colors=colors),
+        hovertemplate='<b>%{label}</b><br>%{value}',
+        pull=[0, 0],
+        textfont=dict(size=16, family="Balto", color="black"),  # Adjust text size and color
+        textinfo='label+percent',  # Show labels and percentages
+    ), row=1, col=2)
+
+    # Add the third pie chart
+    fig.add_trace(go.Pie(
+        name="",
+        labels=labels,
+        values=values3,
+        marker=dict(colors=colors),
+        hovertemplate='<b>%{label}</b><br>%{value}',
+        pull=[0, 0],
+        textfont=dict(size=16, family="Balto", color="black"),  # Adjust text size and color
+        textinfo='label+percent',  # Show labels and percentages
+    ), row=1, col=3)
+
+    # Update layout
+    fig.update_layout(
+        title='Cinsiyet Dağılımları',
+        width=1100,
+        height=500,
+        title_font=dict(size=30, family="Balto", ),  # Adjust title font
+        title_pad_b=10,
+        font=dict(
+            family="Balto",  # Adjust default font family for labels
+            size=14,  # Adjust default font size for labels
+            color="black"  # Adjust default font color for labels
+        ),
+        legend=dict(
+            title_font=dict(size=18, family="Balto"),  # Adjust legend title font
+            font=dict(size=16, family="Balto")  # Adjust legend item font
+        )
+    )
+
+    # Update subplot titles font and style
+
+    for annotation in fig['layout']['annotations']:
+        annotation['y'] = 0.95  # Adjust this value for more/less padding
+
+        # Add the text annotation below the plots
+    fig.add_annotation(
+    text=f"Toplam Nüfus: <b>{df_p.iloc[city_code, 1]}</b>",
+    xref="paper", yref="paper",
+    x=0.5, y=-0.2,
+    showarrow=False,
+    font=dict(size=18, family="Balto", color="black"),
+    align="center"
+)
+    return fig
 
 
 def sales_by_cities_stacked_plot(df_totals_cities):

@@ -56,8 +56,6 @@ def sales_by_cities_df(start_year=2013, end_year=2024):
 
     return df_totals_total, df_totals_cities, df_granular, df_granular_cities
 
-
-
 def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
     """
         This function returns the number of real estates sold to foreigners in each city (İl)
@@ -110,3 +108,18 @@ def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
 
 
     return df_f_total_aggregated, df_f_cities_aggregated
+
+def population_df():
+    df_p = pd.read_excel("./datasets/favori_raporlar.xlsx", header=[0, 1])
+
+    cols = ['il kayit no', 'il adi', 'toplam', 'toplam-erkek', 'toplam-kadin',
+        'il ve ilçe merkezleri-toplam', 'il ve ilçe merkezleri-erkek',
+        'il ve ilçe merkezleri-kadin', 'belde ve köyler-toplam',
+        'belde ve köyler-erkek', 'belde ve köyler-kadin']
+    # df_p.columns = ['-'.join(col).strip().lower() if i >= 3 else col[0].strip().lower() for i, col in enumerate(df_p.columns.values)]
+    df_p.columns = cols
+    df_p.iloc[0,0] = 0
+    df_p.iloc[0,1] = "ÜLKE"
+    df_p.drop("il kayit no", axis=1,inplace=True)
+    return df_p
+
