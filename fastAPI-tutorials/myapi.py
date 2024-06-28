@@ -58,7 +58,7 @@ async def get_total_sales_yearly(city_name: str = None):
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
 
-@app.get("/total_sales_monthly/{city_name}") # city_name is optional. if not provided, will return for all cities
+@app.get("/total_sales_monthly/") # city_name is optional. if not provided, will return for all cities
 async def get_total_sales_yearly(city_name: str = None):
     fig = total_sales_monthly_plot(df_granular_cities, city_name)
     graph_html = pio.to_html(fig, full_html=False)
