@@ -275,12 +275,16 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city=None):
                       )
     else:
         city = city.capitalize()
+        cities = df_f_cities_aggregated["Şehir"].unique()
+        print(city)
+        print(cities)
+        if city not in cities:
+            city = 'Diğer iller - Other provinces'
         dff = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city]
         fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title='Real Estate Sold Over Time',
                      color_discrete_sequence=px.colors.qualitative.Vivid)
     fig.update_layout(width=1800, height=800)
     return fig
-
 
 def population_map():
     pass
