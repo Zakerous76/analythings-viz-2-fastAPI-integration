@@ -267,24 +267,27 @@ def total_sales_foreigners_plot(df_f_total_aggregated):
 
 def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city=None):
     """
-        City must be spelled properly
+    City must be spelled properly
     """
-    if city == None:
-        fig = px.line(df_f_cities_aggregated, x=df_f_cities_aggregated.index, 
-                      y='Total', color='Şehir', title='Real Estate Sold Over Time',
-                      )
-    else:
-        city = city.capitalize()
-        cities = df_f_cities_aggregated["Şehir"].unique()
-        print(city)
-        print(cities)
-        if city not in cities:
-            city = 'Diğer iller - Other provinces'
-        dff = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city]
-        fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title='Real Estate Sold Over Time',
-                     color_discrete_sequence=px.colors.qualitative.Vivid)
-    fig.update_layout(width=1800, height=800)
-    return fig
+    try:
+        if city is None:
+            fig = px.line(df_f_cities_aggregated, x=df_f_cities_aggregated.index, 
+                          y='Total', color='Şehir', title='Real Estate Sold Over Time')
+        else:
+            city = city.capitalize()
+            cities = df_f_cities_aggregated["Şehir"].unique()
+            print("Input city:", city)
+            print("Available cities:", cities)
+            if city not in cities:
+                city = 'Diğer iller - Other provinces'
+            dff = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city]
+            fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title='Real Estate Sold Over Time',
+                          color_discrete_sequence=px.colors.qualitative.Vivid)
+        fig.update_layout(width=1800, height=800)
+        return fig
+    except Exception as e:
+        print(f"Error in plot function: {e}")
+        raise
 
 def population_map():
     pass
