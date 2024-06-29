@@ -3,6 +3,89 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
 
+city_code_map = {0: 'ÜLKE',
+ 1: 'ADANA',
+ 2: 'ADIYAMAN',
+ 3: 'AFYONKARAHİSAR',
+ 4: 'AĞRI',
+ 5: 'AMASYA',
+ 6: 'ANKARA',
+ 7: 'ANTALYA',
+ 8: 'ARTVİN',
+ 9: 'AYDIN',
+ 10: 'BALIKESİR',
+ 11: 'BİLECİK',
+ 12: 'BİNGÖL',
+ 13: 'BİTLİS',
+ 14: 'BOLU',
+ 15: 'BURDUR',
+ 16: 'BURSA',
+ 17: 'ÇANAKKALE',
+ 18: 'ÇANKIRI',
+ 19: 'ÇORUM',
+ 20: 'DENİZLİ',
+ 21: 'DİYARBAKIR',
+ 22: 'EDİRNE',
+ 23: 'ELAZIĞ',
+ 24: 'ERZİNCAN',
+ 25: 'ERZURUM',
+ 26: 'ESKİŞEHİR',
+ 27: 'GAZİANTEP',
+ 28: 'GİRESUN',
+ 29: 'GÜMÜŞHANE',
+ 30: 'HAKKARİ',
+ 31: 'HATAY',
+ 32: 'ISPARTA',
+ 33: 'MERSİN',
+ 34: 'İSTANBUL',
+ 35: 'İZMİR',
+ 36: 'KARS',
+ 37: 'KASTAMONU',
+ 38: 'KAYSERİ',
+ 39: 'KIRKLARELİ',
+ 40: 'KIRŞEHİR',
+ 41: 'KOCAELİ',
+ 42: 'KONYA',
+ 43: 'KÜTAHYA',
+ 44: 'MALATYA',
+ 45: 'MANİSA',
+ 46: 'KAHRAMANMARAŞ',
+ 47: 'MARDİN',
+ 48: 'MUĞLA',
+ 49: 'MUŞ',
+ 50: 'NEVŞEHİR',
+ 51: 'NİĞDE',
+ 52: 'ORDU',
+ 53: 'RİZE',
+ 54: 'SAKARYA',
+ 55: 'SAMSUN',
+ 56: 'SİİRT',
+ 57: 'SİNOP',
+ 58: 'SİVAS',
+ 59: 'TEKİRDAĞ',
+ 60: 'TOKAT',
+ 61: 'TRABZON',
+ 62: 'TUNCELİ',
+ 63: 'ŞANLIURFA',
+ 64: 'UŞAK',
+ 65: 'VAN',
+ 66: 'YOZGAT',
+ 67: 'ZONGULDAK',
+ 68: 'AKSARAY',
+ 69: 'BAYBURT',
+ 70: 'KARAMAN',
+ 71: 'KIRIKKALE',
+ 72: 'BATMAN',
+ 73: 'ŞIRNAK',
+ 74: 'BARTIN',
+ 75: 'ARDAHAN',
+ 76: 'IĞDIR',
+ 77: 'YALOVA',
+ 78: 'KARABÜK',
+ 79: 'KİLİS',
+ 80: 'OSMANİYE',
+ 81: 'DÜZCE'}
+
 def total_sales_animate(df_granular):
 
     # df_granular is your DataFrame and has the necessary data
@@ -117,36 +200,34 @@ def total_sales_plot(df_granular):
 
     return fig
 
-def total_sales_yearly_plot(df_totals_cities, city=None):
+def total_sales_yearly_plot(df_totals_cities, city_code=None):
     """
         City must be spelled properly
     """
-    if city == None:
-        fig = go.Figure(data=[go.Line(name=city, x=df_totals_cities.index, y=df_totals_cities[city]) for city in df_totals_cities.columns], 
+    if city_code == None:
+        fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_totals_cities.index, y=df_totals_cities[city]) for city in df_totals_cities.columns], 
                     layout=dict(height=800, width=1800))
         fig.update_layout(title="İllere Göre Konut Satışı (Yıl Bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
         fig.update_xaxes(tickmode='linear')    
     else:
-        city = city.capitalize()
-        fig = go.Figure(data=[go.Line(name=city, x=df_totals_cities.index, y=df_totals_cities[city])], layout=dict(height=800, width=1800))
-        fig.update_layout(title="İllere Göre Konut Satışı (Yıl Bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
+        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_totals_cities.index, y=df_totals_cities[city_code])], layout=dict(height=800, width=1800))
+        fig.update_layout(title=f"Konut Satışı (Yıl Bazında): {city_code_map[city_code].capitalize()}", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
         fig.update_xaxes(tickmode='linear') 
     return fig
 
 # city => cities
-def total_sales_monthly_plot(df_granular_cities, city=None):
+def total_sales_monthly_plot(df_granular_cities, city_code=None):
     """
         City must be spelled properly
     """
-    if city == None:
-        fig = go.Figure(data=[go.Line(name=city, x=df_granular_cities.index, y=df_granular_cities[city]) for city in df_granular_cities.columns], 
+    if city_code == None:
+        fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_granular_cities.index, y=df_granular_cities[city]) for city in df_granular_cities.columns], 
                 layout=dict(height=800, width=1800))
         fig.update_layout(title="İllere Göre Konut Satışı (Ay bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
   
     else:
-        city = city.capitalize()
-        fig = go.Figure(data=[go.Line(name=city, x=df_granular_cities.index, y=df_granular_cities[city])], layout=dict(height=800, width=1800))
-        fig.update_layout(title="İllere Göre Konut Satışı (Ay bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
+        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_granular_cities.index, y=df_granular_cities[city_code])], layout=dict(height=800, width=1800))
+        fig.update_layout(title=f"Konut Satışı (Ay Bazında): {city_code_map[city_code].capitalize()}", yaxis_title="Toplam Konut Satışı", barmode='stack')
 
     return fig
 

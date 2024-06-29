@@ -75,7 +75,7 @@ async def get_total_sales_animate():
     return HTMLResponse(content=f"{graph_html}")
 
 @app.get("/total_sales_yearly/")
-async def get_total_sales_yearly(city_name: str = Query(None, title="City Name", description="Name of the city")):
+async def get_total_sales_yearly(city_name: int = Query(None, title="City Name", description="Name of the city")):
     fig = total_sales_yearly_plot(df_totals_cities, city_name)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"{graph_html}")

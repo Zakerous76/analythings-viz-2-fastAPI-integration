@@ -20,7 +20,7 @@ def sales_by_cities_df(start_year=2013, end_year=2024):
     """
 
     city_codes = {
-    "yıl": "", "ay": "", 'total': "",
+    "yıl": "Yıl", "ay": "Ay", 'total': "Total",
     'adana': 1,
     'ADıYAMAN': 2,
     'AFYONKARAHiSAR': 3,
@@ -106,9 +106,9 @@ def sales_by_cities_df(start_year=2013, end_year=2024):
     df.rename(columns={df.columns[0]: "Yıl", df.columns[1]: "Ay", df.columns[2]: "Total"}, inplace=True)
     df.ffill(inplace=True)
     df['Yıl'] = df['Yıl'].astype(int)
-    
+
     city_codes = {key.lower(): value for key, value in city_codes.items()}
-    df.columns = df.columns.map(lambda x: f"{str(city_codes[x.lower()])} {x}".strip())
+    df.columns = df.columns.map(lambda x: city_codes[x.lower()])
 
     breakpoint_index = 12
     df_totals_total = df.iloc[:breakpoint_index].copy()
