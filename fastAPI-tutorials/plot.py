@@ -84,7 +84,9 @@ city_code_map = {0: 'ÜLKE',
  78: 'KARABÜK',
  79: 'KİLİS',
  80: 'OSMANİYE',
- 81: 'DÜZCE'}
+ 81: 'DÜZCE',
+ 99: 'Diğer iller - Other Provinces'}
+city_code_f = [48, 33, 35, 16, 99,  9,  7, 54,  6, 34, 77, 61, 55, 41]
 
 def total_sales_animate(df_granular):
 
@@ -346,26 +348,26 @@ def total_sales_foreigners_plot(df_f_total_aggregated):
 
     return fig
 
-def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city=None):
+def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=None):
     """
     City must be spelled properly
     """
+    fig = go.Figure()
     try:
-        if city is None:
+        if city_code is None:
             fig = px.line(df_f_cities_aggregated, x=df_f_cities_aggregated.index, 
-                          y='Total', color='Şehir', title='Real Estate Sold Over Time')
+                            y='Total', color='Şehir', title='İllere Göre Yabancılara Konut Satışı (Ay Bazında)')
         else:
-            city = city.capitalize()
-            cities = df_f_cities_aggregated["Şehir"].unique()
-            print("Input city:", city)
-            print("Available cities:", cities)
-            if city not in cities:
-                city = 'Diğer iller - Other provinces'
-            dff = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city]
-            fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title='Real Estate Sold Over Time',
-                          color_discrete_sequence=px.colors.qualitative.Vivid)
+            p_city_code = city_code
+            if city_code not in city_code_f:
+                city_code = 99
+            dff = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city_code]
+            
+            fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title=f'Yabancılara Konut Satışı (Ay Bazında): {city_code_map[p_city_code].capitalize()}',
+                            color_discrete_sequence=px.colors.qualitative.Vivid)
+            fig.update_layout(showlegend=False)
         fig.update_layout(width=1800, height=800)
-        return fig
+        return
     except Exception as e:
         print(f"Error in plot function: {e}")
         raise

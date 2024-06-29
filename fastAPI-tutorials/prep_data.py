@@ -3,24 +3,9 @@ import locale
 locale.setlocale(locale.LC_TIME, 'tr_TR')
 pd.set_option('future.no_silent_downcasting', True)
 
-def sales_by_cities_df(start_year=2013, end_year=2024):
-    """
-        This function returns the number of real estates sold according in each city (İl)
 
-        params:
-            start_year (int): the starting year for the total number of real estates sold in the country
-            end_year (int): the ending year for the total number of real estates sold in the country
-
-        returns:
-            df_totals_total (pandas_df): Total number of real estates sold in the country
-            df_totals_cities (pandas_df): Total number of real estates sold in each city
-            df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
-                in each month (monthly granularity)
-            df_granular_cities (pandas_df): df_granular without the "Total" column 
-    """
-
-    city_codes = {
-    "yıl": "Yıl", "ay": "Ay", 'total': "Total",
+city_codes = {
+    "yıl": "Yıl", "ay": "Ay", 'total': "Total", 'toplam - total':'toplam - total',
     'adana': 1,
     'ADıYAMAN': 2,
     'AFYONKARAHiSAR': 3,
@@ -101,13 +86,31 @@ def sales_by_cities_df(start_year=2013, end_year=2024):
     'KARABÜK': 78,
     'KiLiS': 79,
     'OSMANiYE': 80,
-    'DÜZCE': 81}
+    'DÜZCE': 81,
+    'Diğer iller - Other Provinces': 99}
+city_codes = {key.lower(): value for key, value in city_codes.items()}
+
+
+def sales_by_cities_df(start_year=2013, end_year=2024):
+    """
+        This function returns the number of real estates sold according in each city (İl)
+
+        params:
+            start_year (int): the starting year for the total number of real estates sold in the country
+            end_year (int): the ending year for the total number of real estates sold in the country
+
+        returns:
+            df_totals_total (pandas_df): Total number of real estates sold in the country
+            df_totals_cities (pandas_df): Total number of real estates sold in each city
+            df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
+                in each month (monthly granularity)
+            df_granular_cities (pandas_df): df_granular without the "Total" column 
+    """
     df = pd.read_excel("./datasets/İllere göre konut satış sayısı.xls")
     df.rename(columns={df.columns[0]: "Yıl", df.columns[1]: "Ay", df.columns[2]: "Total"}, inplace=True)
     df.ffill(inplace=True)
     df['Yıl'] = df['Yıl'].astype(int)
 
-    city_codes = {key.lower(): value for key, value in city_codes.items()}
     df.columns = df.columns.map(lambda x: city_codes[x.lower()])
 
     breakpoint_index = 12
@@ -165,6 +168,9 @@ def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
     df_f["Yıl"] = df_f["Yıl"].ffill().astype(int)
     df_f.drop("Toplam", axis=1, inplace=True)
 
+    df_f['Şehir'] = df_f['Şehir'].map(lambda x: city_codes[x.lower()])
+
+
     df_long = df_f_total.melt(id_vars=['Yıl'], var_name='Ay', value_name='Total')
     df_f_total_aggregated = df_long.groupby(['Yıl', 'Ay']).sum().reset_index()
     month_mapping = {
@@ -177,7 +183,7 @@ def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
     df_f_total_aggregated.set_index("Tarih", inplace=True)
     df_f_total_aggregated["Total"] = df_f_total_aggregated["Total"].astype(int)
 
-    df_f_cities = df_f[df_f['Şehir'] != "Toplam - Total"]
+    df_f_cities = df_f[df_f['Şehir'] != "toplam - total"]
     df_long = df_f_cities.melt(id_vars=['Yıl', 'Şehir'], var_name='Ay', value_name='Total')
     df_f_cities_aggregated = df_long.groupby(['Yıl', 'Şehir', 'Ay']).sum().reset_index()
     df_f_cities_aggregated['Tarih'] = df_f_cities_aggregated.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay']], 1), axis=1)

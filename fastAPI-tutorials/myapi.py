@@ -81,7 +81,7 @@ async def get_total_sales_yearly(city_name: int = Query(None, title="City Name",
     return HTMLResponse(content=f"{graph_html}")
 
 @app.get("/total_sales_monthly/")
-async def get_total_sales_monthly(city_name: str = Query(None, title="City Name", description="Name of the city")):
+async def get_total_sales_monthly(city_name: int = Query(None, title="City Name", description="Name of the city")):
     fig = total_sales_monthly_plot(df_granular_cities, city_name)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"{graph_html}")
@@ -109,9 +109,9 @@ async def get_total_sales_to_foreigners_animate():
     return HTMLResponse(content=f"{graph_html}")
 
 @app.get("/total_sales_monthly_foreigners/")
-async def get_total_sales_monthly_foreigners(city_name: str = Query(None, title="City Name", description="Name of the city")):
+async def get_total_sales_monthly_foreigners(city_name: int = Query(None, title="City Code", description="Code of the city")):
     try:
-        fig = total_sales_monthly_foreigners_plot(df_f_total_aggregated, city_name)
+        fig = total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_name)
         graph_html = pio.to_html(fig, full_html=False)
         return HTMLResponse(content=f"{graph_html}")
     except Exception as e:
