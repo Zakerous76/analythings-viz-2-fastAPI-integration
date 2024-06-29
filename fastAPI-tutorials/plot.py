@@ -375,6 +375,123 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=None):
 def population_map():
     pass
 
+def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None):
+    # Create the figure with subplots
+    labels = ['Erkek', 'Kadın']
+    colors = ['skyblue', 'salmon']
+    title = ""
+    fig = go.Figure()
+
+    if city_name==None and town_name==None and district_name==None:
+        title = "Bütün Ülke"
+        values1 = df_p[["erkek", "kadin"]].sum().to_list()
+        fig.add_trace(go.Pie(
+            name="",
+            labels=labels,
+            values=values1,
+            marker=dict(colors=colors),
+            hovertemplate='<b>%{label}</b><br>%{value}',
+            pull=[0, 0],
+            textfont=dict(size=16, family="Balto", color="black"),  # Adjust text size and color
+            textinfo='label+percent',  # Show labels and percentages
+        ))
+    
+    elif city_name!=None and (town_name==None and district_name==None):
+        title = city_name.capitalize()
+        values1 = df_p[df_p["il adi"]==city_name.upper()]
+        values1 = values1[["erkek", "kadin"]].sum().to_list()
+        fig.add_trace(go.Pie(
+            name="",
+            labels=labels,
+            values=values1,
+            marker=dict(colors=colors),
+            hovertemplate='<b>%{label}</b><br>%{value}',
+            pull=[0, 0],
+            textfont=dict(size=16, family="Balto", color="black"),  # Adjust text size and color
+            textinfo='label+percent',  # Show labels and percentages
+        ))
+    
+    elif city_name!=None and (town_name!=None and district_name==None):
+        title = f"{city_name.capitalize()}, {town_name.capitalize()}"
+        values1 = df_p[(df_p["il adi"]==city_name.upper()) & (df_p["ilçe adi"]==town_name.upper())]
+        values1 = values1[["erkek", "kadin"]].sum().to_list()
+        fig.add_trace(go.Pie(
+            name="",
+            labels=labels,
+            values=values1,
+            marker=dict(colors=colors),
+            hovertemplate='<b>%{label}</b><br>%{value}',
+            pull=[0, 0],
+            textfont=dict(size=16, family="Balto", color="black"),  # Adjust text size and color
+            textinfo='label+percent',  # Show labels and percentages
+        ))
+    
+    elif city_name!=None and (town_name!=None and district_name!=None):
+        title = f"{city_name.capitalize()}, {town_name.capitalize()}, {district_name.capitalize()} Mh."
+        if len(district_name.split()) > 1:
+            district_name = district_name + " Mh."
+        values1 = df_p[(df_p["il adi"]==city_name.upper()) & (df_p["ilçe adi"]==town_name.upper()) & (df_p["mahalle adi"]==" ".join(district_name.split()[:-1]).upper())] # assuming that every mahalle ends with MH.
+        values1 = values1[["erkek", "kadin"]].sum().to_list()
+        fig.add_trace(go.Pie(
+            name="",
+            labels=labels,
+            values=values1,
+            marker=dict(colors=colors),
+            hovertemplate='<b>%{label}</b><br>%{value}',
+            pull=[0, 0],
+            textfont=dict(size=16, family="Balto", color="black"),  # Adjust text size and color
+            textinfo='label+percent',  # Show labels and percentages
+        ))
+    else:
+        fig.add_annotation(
+        text="Please enter either: Only city name, City name and Town name, or all three",
+        xref="paper", yref="paper",
+        x=0.5, y=0.5, showarrow=False,
+        font=dict(
+            family="Balto, Arial, sans-serif",
+            size=20,
+            color="black"
+            )
+        )
+
+        # Update layout to remove axes
+        fig.update_layout(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            plot_bgcolor='rgba(0,0,0,0)',
+            margin=dict(l=0, r=0, t=0, b=0)
+        )
+        return fig
+
+    # Update layout
+    fig.update_layout(
+        title=f'Cinsiyet Dağılımları: {title}',
+        width=900,
+        height=500,
+        title_font=dict(size=30, family="Balto", ),  # Adjust title font
+        title_pad_b=10,
+        font=dict(
+            family="Balto",  # Adjust default font family for labels
+            size=14,  # Adjust default font size for labels
+            color="black"  # Adjust default font color for labels
+        ),
+        showlegend=False
+    )
+
+    for annotation in fig['layout']['annotations']:
+        annotation['y'] = 0.95  # Adjust this value for more/less padding
+
+    # Add the text annotation below the plots
+    fig.add_annotation(
+        text=f"Toplam Nüfus: <b>{sum(values1):,}</b>",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.2,
+        showarrow=False,
+        font=dict(size=18, family="Balto", color="black"),
+        align="center"
+    )
+    return fig
+
 def population_plot(df_p, city_code=0):
     # Create the figure with subplots
     fig = make_subplots(rows=1, cols=3, specs=[[{'type': 'pie'}, {'type': 'pie'}, {'type': 'pie'}]], subplot_titles=(df_p.iloc[city_code, 0].capitalize(), "İl ve İlçe Merkezleri", "Belde ve Köyler"))
