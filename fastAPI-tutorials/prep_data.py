@@ -202,16 +202,22 @@ def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
     return df_f_total_aggregated, df_f_cities_aggregated
 
 def population_df():
-    df_p = pd.read_excel("./datasets/favori_raporlar.xlsx", header=[0, 1])
-
-    cols = ['il kayit no', 'il adi', 'toplam', 'toplam-erkek', 'toplam-kadin',
-        'il ve ilçe merkezleri-toplam', 'il ve ilçe merkezleri-erkek',
-        'il ve ilçe merkezleri-kadin', 'belde ve köyler-toplam',
-        'belde ve köyler-erkek', 'belde ve köyler-kadin']
-    # df_p.columns = ['-'.join(col).strip().lower() if i >= 3 else col[0].strip().lower() for i, col in enumerate(df_p.columns.values)]
+    df_p = pd.read_excel("./datasets/favori_raporlar.xlsx",  sheet_name="MAHALLE NÜFUSU", index_col=0)
+    cols = ['il kayit no', 'ilçe kayit no', 'belde/köy kayit no', 'mahalle kayit no',
+    'il adi', 'ilçe adi', 'belediye adi', 'mahalle adi', 'mahallenin bağli olduğu belediyenin niteliği',
+    'toplam', 'erkek', 'kadin']
     df_p.columns = cols
-    df_p.iloc[0,0] = 0
-    df_p.iloc[0,1] = "ÜLKE"
-    df_p.drop("il kayit no", axis=1,inplace=True)
+
+    # df_p_cities[(df_p_cities["mahalle adi"]==" ".join("2000 Evler Mh.".split()[:-1]).upper()) & (df_p_cities["ilçe adi"]=="seyhan".upper())] #for query
+
+    df_p = df_p[["il adi", "ilçe adi", "mahalle adi", "erkek", "kadin"]]
+    df_p.erkek = df_p.erkek.replace("C", "0").astype(int)
+    df_p.kadin = df_p.kadin.replace("C", "0")
+    df_p.kadin = df_p.kadin.replace("-", "0").astype(int)
+
+    df_p = df_p.groupby(["il adi", "ilçe adi", "mahalle adi"])[["erkek", "kadin"]].sum().reset_index()
+
     return df_p
+
+
 
