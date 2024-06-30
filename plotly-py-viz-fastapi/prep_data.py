@@ -1,6 +1,4 @@
 import pandas as pd
-import locale
-locale.setlocale(locale.LC_TIME, 'tr_TR')
 pd.set_option('future.no_silent_downcasting', True)
 
 

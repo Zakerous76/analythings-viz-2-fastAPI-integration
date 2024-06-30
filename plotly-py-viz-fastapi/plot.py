@@ -202,11 +202,11 @@ def total_sales_plot(df_granular):
 
     return fig
 
-def total_sales_yearly_plot(df_totals_cities, city_code=None):
+def total_sales_yearly_plot(df_totals_cities, city_code=0):
     """
         City must be spelled properly
     """
-    if city_code == None:
+    if city_code == 0:
         fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_totals_cities.index, y=df_totals_cities[city]) for city in df_totals_cities.columns], 
                     layout=dict(height=800, width=1800))
         fig.update_layout(title="İllere Göre Konut Satışı (Yıl Bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
@@ -218,11 +218,11 @@ def total_sales_yearly_plot(df_totals_cities, city_code=None):
     return fig
 
 # city => cities
-def total_sales_monthly_plot(df_granular_cities, city_code=None):
+def total_sales_monthly_plot(df_granular_cities, city_code=0):
     """
         City must be spelled properly
     """
-    if city_code == None:
+    if city_code == 0:
         fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_granular_cities.index, y=df_granular_cities[city]) for city in df_granular_cities.columns], 
                 layout=dict(height=800, width=1800))
         fig.update_layout(title="İllere Göre Konut Satışı (Ay bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
@@ -348,13 +348,13 @@ def total_sales_foreigners_plot(df_f_total_aggregated):
 
     return fig
 
-def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=None):
+def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0):
     """
-    City must be spelled properly
+
     """
     fig = go.Figure()
     try:
-        if city_code is None:
+        if city_code == 0:
             fig = px.line(df_f_cities_aggregated, x=df_f_cities_aggregated.index, 
                             y='Total', color='Şehir', title='İllere Göre Yabancılara Konut Satışı (Ay Bazında)')
         else:
@@ -367,7 +367,7 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=None):
                             color_discrete_sequence=px.colors.qualitative.Vivid)
             fig.update_layout(showlegend=False)
         fig.update_layout(width=1800, height=800)
-        return
+        return fig
     except Exception as e:
         print(f"Error in plot function: {e}")
         raise

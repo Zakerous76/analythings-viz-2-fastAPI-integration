@@ -53,16 +53,16 @@ async def get_home():
     ]
     forms = [
         create_html_form("Total Sales (start_year end_year)", "/total_sales", "interval"),
-        create_html_form("Total Sales Yearly (city_name)", "/total_sales_yearly", "city_name"),
-        create_html_form("Total Sales Monthly (city_name)", "/total_sales_monthly", "city_name"),
-        create_html_form("Total Sales Monthly Foreigners (city_name)", "/total_sales_monthly_foreigners", "city_name")
+        create_html_form("Total Sales Yearly (city_code)", "/total_sales_yearly", "city_code"),
+        create_html_form("Total Sales Monthly (city_code)", "/total_sales_monthly", "city_code"),
+        create_html_form("Total Sales Monthly Foreigners (city_code)", "/total_sales_monthly_foreigners", "city_code")
     ]
     return HTMLResponse(content=html_content.format(buttons=" ".join(buttons), forms=" ".join(forms)))
 
 
 
 @app.get("/total_sales")
-async def get_total_sales(interval: str = Query(None, title="City Name", description="Name of the city")):
+async def get_total_sales(interval: str = Query(None, title="Interval", description="Write the interval (ex: 2015 2021)")):
     start_year, end_year = int(interval.split()[0]), int(interval.split()[1])
     fig = total_sales_plot(df_granular[(df_granular.index.year <= end_year) & (df_granular.index.year >= start_year)])
     graph_html = pio.to_html(fig, full_html=False) # will return a single <div> element
@@ -75,14 +75,14 @@ async def get_total_sales_animate():
     return HTMLResponse(content=f"{graph_html}")
 
 @app.get("/total_sales_yearly/")
-async def get_total_sales_yearly(city_name: int = Query(None, title="City Name", description="Name of the city")):
-    fig = total_sales_yearly_plot(df_totals_cities, city_name)
+async def get_total_sales_yearly(city_code: int = Query(0, title="City Code", description="Enter the city code (ex: Ankara is 6)")):
+    fig = total_sales_yearly_plot(df_totals_cities, city_code)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"{graph_html}")
 
 @app.get("/total_sales_monthly/")
-async def get_total_sales_monthly(city_name: int = Query(None, title="City Name", description="Name of the city")):
-    fig = total_sales_monthly_plot(df_granular_cities, city_name)
+async def get_total_sales_monthly(city_code: int = Query(0, title="City Code", description="Enter the city code (ex: Ankara is 6)")):
+    fig = total_sales_monthly_plot(df_granular_cities, city_code)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"{graph_html}")
 
@@ -109,9 +109,9 @@ async def get_total_sales_to_foreigners_animate():
     return HTMLResponse(content=f"{graph_html}")
 
 @app.get("/total_sales_monthly_foreigners/")
-async def get_total_sales_monthly_foreigners(city_name: int = Query(None, title="City Code", description="Code of the city")):
+async def get_total_sales_monthly_foreigners(city_code: int = Query(0, title="City Code", description="Enter the city code (ex: Ankara is 6)")):
     try:
-        fig = total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_name)
+        fig = total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code)
         graph_html = pio.to_html(fig, full_html=False)
         return HTMLResponse(content=f"{graph_html}")
     except Exception as e:
@@ -120,7 +120,7 @@ async def get_total_sales_monthly_foreigners(city_name: int = Query(None, title=
 
 
 @app.get("/population_plot")
-async def get_population_plot(city_code: int = Query(0, title="City Code", description="Code of the city")):
+async def get_population_plot(city_code: int = Query(0, title="City Code", description="Enter the city code (ex: Ankara is 6)")):
     fig = population_plot(df_p, city_code)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"{graph_html}")
