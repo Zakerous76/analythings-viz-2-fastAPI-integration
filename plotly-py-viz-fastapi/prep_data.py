@@ -200,7 +200,7 @@ def sales_by_cities_foreigners_df(start_year=2013, end_year=2024):
     return df_f_total_aggregated, df_f_cities_aggregated
 
 def population_df():
-    df_p = pd.read_excel("./datasets/favori_raporlar.xlsx",  sheet_name="MAHALLE NÜFUSU", index_col=0)
+    df_p = pd.read_excel("./datasets/nüfus.xlsx",  sheet_name="MAHALLE NÜFUSU", index_col=0)
     cols = ['il kayit no', 'ilçe kayit no', 'belde/köy kayit no', 'mahalle kayit no',
     'il adi', 'ilçe adi', 'belediye adi', 'mahalle adi', 'mahallenin bağli olduğu belediyenin niteliği',
     'toplam', 'erkek', 'kadin']

@@ -382,7 +382,7 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
     title = ""
     fig = go.Figure()
 
-    if city_name==None and town_name==None and district_name==None:
+    if city_name=="" and town_name=="" and district_name=="":
         title = "Bütün Ülke"
         values1 = df_p[["erkek", "kadin"]].sum().to_list()
         fig.add_trace(go.Pie(
@@ -396,7 +396,7 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
             textinfo='label+percent',  # Show labels and percentages
         ))
     
-    elif city_name!=None and (town_name==None and district_name==None):
+    elif city_name!="" and (town_name=="" and district_name==""):
         title = city_name.capitalize()
         values1 = df_p[df_p["il adi"]==city_name.upper()]
         values1 = values1[["erkek", "kadin"]].sum().to_list()
@@ -411,7 +411,7 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
             textinfo='label+percent',  # Show labels and percentages
         ))
     
-    elif city_name!=None and (town_name!=None and district_name==None):
+    elif city_name!="" and (town_name!="" and district_name==""):
         title = f"{city_name.capitalize()}, {town_name.capitalize()}"
         values1 = df_p[(df_p["il adi"]==city_name.upper()) & (df_p["ilçe adi"]==town_name.upper())]
         values1 = values1[["erkek", "kadin"]].sum().to_list()
@@ -426,7 +426,7 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
             textinfo='label+percent',  # Show labels and percentages
         ))
     
-    elif city_name!=None and (town_name!=None and district_name!=None):
+    elif city_name!="" and (town_name!="" and district_name!=""):
         title = f"{city_name.capitalize()}, {town_name.capitalize()}, {district_name.capitalize()} Mh."
         if len(district_name.split()) > 1:
             district_name = district_name + " Mh."
