@@ -2,8 +2,6 @@ import plotly.graph_objs as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
-import json
-import numpy as np
 
 city_code_map = {0: 'ÜLKE',
  1: 'ADANA',
