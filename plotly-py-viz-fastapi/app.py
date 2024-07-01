@@ -16,6 +16,10 @@ class PlotRequest(BaseModel):
     plot_type: str
     data: dict
 
+class PriceAgePlotRequest(BaseModel):
+    result: dict
+    data: list
+
 def create_html_button(label, link):
     return f'<button onclick="window.location.href=\'{link}\'">{label}</button>'
 
@@ -139,12 +143,22 @@ async def get_population_mah_plot(city_name: str = Query(None, title="City Name"
                                   district_name: str = Query(None, title="District Name", description="Name of the district")):
     fig = population_mah_plot(df_p, city_name, town_name, district_name)
     graph_html = pio.to_html(fig, full_html=False)
-    return HTMLResponse(content=f"<html><body>{graph_html}</body></html>")
+    return HTMLResponse(content=f"{graph_html}")
 
 
 @app.get("/population_map") # with gender
 async def get_population_map():
     pass
+
+@app.post("/price_age_plot", response_class=HTMLResponse)
+async def get_price_age_plot(plot_request: PriceAgePlotRequest):
+    try:
+        fig_price, fig_age = price_age_plot(plot_request.result, plot_request.data)
+        price_html = pio.to_html(fig_price, full_html=False)
+        age_html = pio.to_html(fig_age, full_html=False)
+        return HTMLResponse(content=f"{price_html}{age_html}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating plots: {str(e)}")
 
 # ------------------------------------------------------------------------------------------------
 # Report

@@ -2,6 +2,8 @@ import plotly.graph_objs as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
+import json
+import numpy as np
 
 city_code_map = {0: 'ÜLKE',
  1: 'ADANA',
@@ -572,6 +574,128 @@ def population_plot(df_p, city_code=0):
 )
     return fig
 
+def price_age_plot(result: dict, data: list):
+    # Calculate min, max, median, and average prices from the result
+    min_price = result["min_price"]
+    max_price = result["max_price"]
+    avg_price = result["avg_price"]
+
+    # Create traces for price statistics
+    traces = []
+
+    traces.append(go.Scatter(
+        x=[min_price, max_price],
+        y=[1, 1],
+        mode='lines',
+        line=dict(color='black', width=2),
+        showlegend=False,
+        name=""
+    ))
+
+    traces.append(go.Scatter(
+        x=[min_price, avg_price, max_price],
+        y=[1, 1, 1],
+        mode='markers+text',
+        text=[f'{min_price:,} TL', f'{avg_price:,.0f} TL', f'{max_price:,} TL'],
+        textposition='top center',
+        marker=dict(color=['green', 'blue', 'red'], size=10),
+        name="",
+        showlegend=False,
+        hovertemplate='%{x:,.0f} TL'
+    ))
+
+    # Min price trace
+    traces.append(go.Scatter(
+        x=[min_price],
+        y=[1],
+        mode='markers',
+        marker=dict(color='green', size=10, symbol='square'),
+        name='Min',
+        showlegend=True,
+        hovertemplate='%{x:,.0f} TL'
+    ))
+
+    # Average price trace
+    traces.append(go.Scatter(
+        x=[avg_price],
+        y=[1],
+        mode='markers',
+        marker=dict(color='blue', size=10, symbol='square'),
+        name='Ortalama',
+        showlegend=True,
+        hovertemplate='%{x:,.0f} TL'
+    ))
+
+    # Max price trace
+    traces.append(go.Scatter(
+        x=[max_price],
+        y=[1],
+        mode='markers',
+        marker=dict(color='red', size=10, symbol='square'),
+        name='Maks',
+        showlegend=True,
+        hovertemplate='%{x:,.0f} TL'
+    ))
+
+    # Create the price figure
+    fig_price = go.Figure(data=traces)
+
+    # Update layout for the price figure
+    fig_price.update_layout(
+        title_text="Fiyat İstatistiği",
+        xaxis_title="Fiyat (TL)",
+        yaxis=dict(showticklabels=False, showgrid=False),  # Hide the y-axis ticks and labels
+        width=900,
+        height=230,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    # Extract ages from the data field
+    ages = [item['age'] for item in data]
+    ages = sorted(ages)
+
+    # Calculate age group percentages
+    age_groups = {}
+    total_ages = len(ages)
+
+    for age in ages:
+        if age in age_groups:
+            age_groups[age] += 1
+        else:
+            age_groups[age] = 1
+
+    age_group_percentages = {group: count / total_ages * 100 for group, count in age_groups.items()}
+
+    # Create the age distribution pie chart
+    labels = list(age_group_percentages.keys())
+    values = list(age_group_percentages.values())
+
+    fig_age = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.4,
+                                     hovertemplate="Bina Yaşı: %{label}<br>Yüzdelik: %{value:.1f}%<extra></extra>",
+                                     sort=False)])
+
+    # Update layout for the age figure
+    fig_age.update_layout(
+        title_text="Bina Yaşı Dağılımı",
+        width=600,
+        height=500,
+    )
+
+    fig_age.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=-0.3,
+        xanchor="center",
+        x=.5
+    ))
+
+    return fig_price, fig_age
 
 def sales_by_cities_stacked_plot(df_totals_cities):
     cols = df_totals_cities.columns[:-1]
