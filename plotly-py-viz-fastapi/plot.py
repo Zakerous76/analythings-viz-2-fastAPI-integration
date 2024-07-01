@@ -233,7 +233,6 @@ def total_sales_monthly_plot(df_granular_cities, city_code=0):
 
     return fig
 
-
 def total_sales_foreigners_animate(df_f_total_aggregated):
 
     # df_F_total_aggregated is your DataFrame and has the necessary data
