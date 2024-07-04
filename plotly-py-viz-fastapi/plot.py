@@ -88,7 +88,7 @@ city_code_map = {0: 'ÜLKE',
  99: 'Diğer iller - Other Provinces'}
 city_code_f = [48, 33, 35, 16, 99,  9,  7, 54,  6, 34, 77, 61, 55, 41]
 
-def total_sales_animate(df_granular):
+def total_sales_animate(df_granular, width=None, height=800):
 
     # df_granular is your DataFrame and has the necessary data
     # Calculate the min and max values for the x and y axis
@@ -97,8 +97,7 @@ def total_sales_animate(df_granular):
     y_min = 0
     y_max = df_granular['Total'].max()*1.2
 
-    # Create figure
-    fig = go.Figure(layout=dict(height=800, width=1800))
+    fig = go.Figure(layout=dict(height=height, width=width))
 
     # Initial empty plot
     fig.add_trace(go.Scatter(x=df_granular.index, y=[None]*len(df_granular), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Toplam Konut Satış'))
@@ -170,7 +169,7 @@ def total_sales_animate(df_granular):
 
     return fig
 
-def total_sales_plot(df_granular):
+def total_sales_plot(df_granular, width=None, height=800):
 
     # Calculate the min and max values for the x and y axis
     x_min = df_granular.index.min() - pd.Timedelta(days=2)
@@ -180,7 +179,7 @@ def total_sales_plot(df_granular):
     y_max = df_granular['Total'].max()*1.2
 
     # Create figure
-    fig = go.Figure(layout=dict(height=800, width=1800))
+    fig = go.Figure(layout=dict(height=height, width=width))
 
     # Initial empty plot
     fig.add_trace(go.Scatter(x=df_granular.index, y=df_granular["Total"], mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Toplam Konut Satış'))
@@ -202,38 +201,38 @@ def total_sales_plot(df_granular):
 
     return fig
 
-def total_sales_yearly_plot(df_totals_cities, city_code=0):
+def total_sales_yearly_plot(df_totals_cities, city_code=0, width=None, height=800):
     """
         City must be spelled properly
     """
     if city_code == 0:
         fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_totals_cities.index, y=df_totals_cities[city]) for city in df_totals_cities.columns], 
-                    layout=dict(height=800, width=1800))
+                    layout=dict(height=height, width=width))
         fig.update_layout(title="İllere Göre Konut Satışı (Yıl Bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
         fig.update_xaxes(tickmode='linear')    
     else:
-        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_totals_cities.index, y=df_totals_cities[city_code])], layout=dict(height=800, width=1800))
+        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_totals_cities.index, y=df_totals_cities[city_code])], layout=dict(height=height, width=width))
         fig.update_layout(title=f"Konut Satışı (Yıl Bazında): {city_code_map[city_code].capitalize()}", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
         fig.update_xaxes(tickmode='linear') 
     return fig
 
 # city => cities
-def total_sales_monthly_plot(df_granular_cities, city_code=0):
+def total_sales_monthly_plot(df_granular_cities, city_code=0, width=None, height=800):
     """
         City must be spelled properly
     """
     if city_code == 0:
         fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_granular_cities.index, y=df_granular_cities[city]) for city in df_granular_cities.columns], 
-                layout=dict(height=800, width=1800))
+                layout=dict(height=height, width=width))
         fig.update_layout(title="İllere Göre Konut Satışı (Ay bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
   
     else:
-        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_granular_cities.index, y=df_granular_cities[city_code])], layout=dict(height=800, width=1800))
+        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_granular_cities.index, y=df_granular_cities[city_code])], layout=dict(height=height, width=width))
         fig.update_layout(title=f"Konut Satışı (Ay Bazında): {city_code_map[city_code].capitalize()}", yaxis_title="Toplam Konut Satışı", barmode='stack')
 
     return fig
 
-def total_sales_foreigners_animate(df_f_total_aggregated):
+def total_sales_foreigners_animate(df_f_total_aggregated, width=None, height=800):
 
     # df_F_total_aggregated is your DataFrame and has the necessary data
     # Calculate the min and max values for the x and y axis
@@ -243,7 +242,7 @@ def total_sales_foreigners_animate(df_f_total_aggregated):
     y_max = df_f_total_aggregated['Total'].max()*1.2
 
     # Create figure
-    fig = go.Figure(layout=dict(height=800, width=1800))
+    fig = go.Figure(layout=dict(height=height, width=width))
 
     # Initial empty plot
     fig.add_trace(go.Scatter(x=df_f_total_aggregated.index, y=[None]*len(df_f_total_aggregated), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Yabancılara Toplam Konut Satış'))
@@ -315,7 +314,7 @@ def total_sales_foreigners_animate(df_f_total_aggregated):
 
     return fig
 
-def total_sales_foreigners_plot(df_f_total_aggregated):
+def total_sales_foreigners_plot(df_f_total_aggregated, width=None, height=800):
 
     # Calculate the min and max values for the x and y axis
     x_min = df_f_total_aggregated.index.min() - pd.Timedelta(days=2)
@@ -325,7 +324,7 @@ def total_sales_foreigners_plot(df_f_total_aggregated):
     y_max = df_f_total_aggregated['Total'].max()*1.2
 
     # Create figure
-    fig = go.Figure(layout=dict(height=800, width=1800))
+    fig = go.Figure(layout=dict(height=height, width=width))
 
     # Initial empty plot
     fig.add_trace(go.Scatter(x=df_f_total_aggregated.index, y=df_f_total_aggregated["Total"], mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Yabancılara Toplam Konut Satış'))
@@ -347,7 +346,7 @@ def total_sales_foreigners_plot(df_f_total_aggregated):
 
     return fig
 
-def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0):
+def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code, width=None, height=800):
     """
 
     """
@@ -365,16 +364,13 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0):
             fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title=f'Yabancılara Konut Satışı (Ay Bazında): {city_code_map[p_city_code].capitalize()}',
                             color_discrete_sequence=px.colors.qualitative.Vivid)
             fig.update_layout(showlegend=False)
-        fig.update_layout(width=1800, height=800)
+        fig.update_layout(width=width, height=height)
         return fig
     except Exception as e:
         print(f"Error in plot function: {e}")
         raise
 
-def population_map():
-    pass
-
-def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None):
+def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None, width=None, height=800):
     # Create the figure with subplots
     labels = ['Erkek', 'Kadın']
     colors = ['skyblue', 'salmon']
@@ -465,8 +461,8 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
     # Update layout
     fig.update_layout(
         title=f'Cinsiyet Dağılımları: {title}',
-        width=900,
-        height=500,
+        width=width,
+        height=height,
         title_font=dict(size=30, family="Balto", ),  # Adjust title font
         title_pad_b=10,
         font=dict(
@@ -491,7 +487,7 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
     )
     return fig
 
-def population_plot(df_p, city_code=0):
+def population_plot(df_p, city_code=0, width=None, height=500):
     # Create the figure with subplots
     fig = make_subplots(rows=1, cols=3, specs=[[{'type': 'pie'}, {'type': 'pie'}, {'type': 'pie'}]], subplot_titles=(df_p.iloc[city_code, 0].capitalize(), "İl ve İlçe Merkezleri", "Belde ve Köyler"))
 
@@ -541,8 +537,8 @@ def population_plot(df_p, city_code=0):
     # Update layout
     fig.update_layout(
         title='Cinsiyet Dağılımları',
-        width=1100,
-        height=500,
+        width=width,
+        height=height,
         title_font=dict(size=30, family="Balto", ),  # Adjust title font
         title_pad_b=10,
         font=dict(
@@ -572,7 +568,7 @@ def population_plot(df_p, city_code=0):
 )
     return fig
 
-def price_age_plot(result: dict, data: list):
+def price_age_plot(result: dict, data: list, width=None, height=500):
     # Calculate min, max, median, and average prices from the result
     min_price = result["min_price"]
     max_price = result["max_price"]
@@ -643,7 +639,7 @@ def price_age_plot(result: dict, data: list):
         title_text="Fiyat İstatistiği",
         xaxis_title="Fiyat (TL)",
         yaxis=dict(showticklabels=False, showgrid=False),  # Hide the y-axis ticks and labels
-        width=900,
+        width=width,
         height=230,
         legend=dict(
             orientation="h",
@@ -681,8 +677,8 @@ def price_age_plot(result: dict, data: list):
     # Update layout for the age figure
     fig_age.update_layout(
         title_text="Bina Yaşı Dağılımı",
-        width=600,
-        height=500,
+        width=width,
+        height=height,
     )
 
     fig_age.update_layout(legend=dict(
