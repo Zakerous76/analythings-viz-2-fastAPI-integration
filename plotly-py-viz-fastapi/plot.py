@@ -3,6 +3,8 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
 
+font_family="Verdana"
+
 city_code_map = {0: 'ÜLKE',
  1: 'ADANA',
  2: 'ADIYAMAN',
@@ -138,14 +140,20 @@ def total_sales_animate(df_granular, width=None, height=800):
         title=f'Ülkede Toplam Konut Satış ({df_granular.index.min().year}-{df_granular.index.max().year})',
         xaxis_title='Tarih',
         yaxis_title='Toplam',
-        title_font=dict(size=30, family="Roboto"),
-        xaxis=dict(tickangle=-45, tickfont=dict(family="Roboto", size=12), showgrid=True, range=[x_min, x_max]),
-        yaxis=dict(tickfont=dict(family="Roboto", size=12), tickformat=',', showgrid=True, range=[y_min, y_max]),
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, range=[x_min, x_max], gridcolor="lightgray"),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, range=[y_min, y_max], gridcolor="lightgray"),
         margin=dict(l=110, r=20, t=100, b=110),
         hovermode='x',
-        legend=dict(font=dict(family="Roboto", size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
-        xaxis_title_font=dict(size=20, family="Roboto", color='black', weight='bold'),
-        yaxis_title_font=dict(size=20, color='black', weight='bold'),
+        legend=dict(font=dict(family=font_family, size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
+        xaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+        plot_bgcolor="#f3f4f6",
+        # paper_bgcolor="rgb(0,0,0,0)",
         updatemenus=updatemenus,
         sliders=[{
             'yanchor': 'top',
@@ -189,14 +197,19 @@ def total_sales_plot(df_granular, width=None, height=800):
         title=f'Ülkede Toplam Konut Satış ({df_granular.index.min().year}-{df_granular.index.max().year})',
         xaxis_title='Tarih',
         yaxis_title='Toplam',
-        title_font=dict(size=30, family="Roboto"),
-        xaxis=dict(tickangle=-45, tickfont=dict(family="Roboto", size=12), showgrid=True, range=[x_min, x_max]),
-        yaxis=dict(tickfont=dict(family="Roboto", size=12), tickformat=',', showgrid=True, range=[y_min, y_max]),
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, range=[x_min, x_max], gridcolor="lightgray"),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, range=[y_min, y_max], gridcolor="lightgray"),
+        plot_bgcolor="#f3f4f6",
+
         margin=dict(l=110, r=20, t=100, b=110),
-        hovermode='x',
-        legend=dict(font=dict(family="Roboto", size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
-        xaxis_title_font=dict(size=20, family="Roboto", color='black', weight='bold'),
-        yaxis_title_font=dict(size=20, color='black', weight='bold'),
+        xaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+
     )
 
     return fig
@@ -214,6 +227,20 @@ def total_sales_yearly_plot(df_totals_cities, city_code=0, width=None, height=80
         fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_totals_cities.index, y=df_totals_cities[city_code])], layout=dict(height=height, width=width))
         fig.update_layout(title=f"Konut Satışı (Yıl Bazında): {city_code_map[city_code].capitalize()}", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
         fig.update_xaxes(tickmode='linear') 
+
+    fig.update_layout(
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, gridcolor="lightgray", ),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, gridcolor="lightgray",),
+        plot_bgcolor="#f3f4f6",
+
+        margin=dict(l=110, r=20, t=100, b=110),
+        hovermode='x',
+        xaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+
+    )
+    
     return fig
 
 # city => cities
@@ -229,6 +256,22 @@ def total_sales_monthly_plot(df_granular_cities, city_code=0, width=None, height
     else:
         fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_granular_cities.index, y=df_granular_cities[city_code])], layout=dict(height=height, width=width))
         fig.update_layout(title=f"Konut Satışı (Ay Bazında): {city_code_map[city_code].capitalize()}", yaxis_title="Toplam Konut Satışı", barmode='stack')
+    
+    fig.update_layout(
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, gridcolor="lightgray", ),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, gridcolor="lightgray",),
+        plot_bgcolor="#f3f4f6",
+
+        margin=dict(l=110, r=20, t=100, b=110),
+        xaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+
+    )
 
     return fig
 
@@ -283,14 +326,20 @@ def total_sales_foreigners_animate(df_f_total_aggregated, width=None, height=800
         title=f'Ülkede Yabancılara Toplam Konut Satış ({df_f_total_aggregated.index.min().year}-{df_f_total_aggregated.index.max().year})',
         xaxis_title='Tarih',
         yaxis_title='Toplam',
-        title_font=dict(size=30, family="Roboto"),
-        xaxis=dict(tickangle=-45, tickfont=dict(family="Roboto", size=12), showgrid=True, range=[x_min, x_max]),
-        yaxis=dict(tickfont=dict(family="Roboto", size=12), tickformat=',', showgrid=True, range=[y_min, y_max]),
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, range=[x_min, x_max], gridcolor="lightgray"),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, range=[y_min, y_max], gridcolor="lightgray"),
         margin=dict(l=110, r=20, t=100, b=110),
         hovermode='x',
-        legend=dict(font=dict(family="Roboto", size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
-        xaxis_title_font=dict(size=20, family="Roboto", color='black', weight='bold'),
-        yaxis_title_font=dict(size=20, color='black', weight='bold'),
+        legend=dict(font=dict(family=font_family, size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
+        xaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+        plot_bgcolor="#f3f4f6",
+        # paper_bgcolor="rgb(0,0,0,0)",
         updatemenus=updatemenus,
         sliders=[{
             'yanchor': 'top',
@@ -334,14 +383,18 @@ def total_sales_foreigners_plot(df_f_total_aggregated, width=None, height=800):
         title=f'Ülkede Yabancılara Toplam Konut Satış ({df_f_total_aggregated.index.min().year}-{df_f_total_aggregated.index.max().year})',
         xaxis_title='Tarih',
         yaxis_title='Toplam',
-        title_font=dict(size=30, family="Roboto"),
-        xaxis=dict(tickangle=-45, tickfont=dict(family="Roboto", size=12), showgrid=True, range=[x_min, x_max]),
-        yaxis=dict(tickfont=dict(family="Roboto", size=12), tickformat=',', showgrid=True, range=[y_min, y_max]),
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, range=[x_min, x_max], gridcolor="lightgray"),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, range=[y_min, y_max], gridcolor="lightgray"),
+        plot_bgcolor="#f3f4f6",
+
         margin=dict(l=110, r=20, t=100, b=110),
-        hovermode='x',
-        legend=dict(font=dict(family="Roboto", size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
-        xaxis_title_font=dict(size=20, family="Roboto", color='black', weight='bold'),
-        yaxis_title_font=dict(size=20, color='black', weight='bold'),
+        xaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', 
+                            #   weight='bold'
+                              ),
     )
 
     return fig
@@ -364,7 +417,17 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code, width
             fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title=f'Yabancılara Konut Satışı (Ay Bazında): {city_code_map[p_city_code].capitalize()}',
                             color_discrete_sequence=px.colors.qualitative.Vivid)
             fig.update_layout(showlegend=False)
-        fig.update_layout(width=width, height=height)
+        fig.update_layout(
+            width=width, 
+            height=height,
+            title_font=dict(size=30, family=font_family, weight="bold"),
+            xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, gridcolor="lightgray"),
+            yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, gridcolor="lightgray"),
+            plot_bgcolor="#f3f4f6",
+            margin=dict(l=110, r=20, t=100, b=110),
+            xaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+            yaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+        )
         return fig
     except Exception as e:
         print(f"Error in plot function: {e}")
@@ -459,19 +522,15 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
         return fig
 
     # Update layout
+
     fig.update_layout(
-        title=f'Cinsiyet Dağılımları: {title}',
-        width=width,
-        height=height,
-        title_font=dict(size=30, family="Balto", ),  # Adjust title font
-        title_pad_b=10,
-        font=dict(
-            family="Balto",  # Adjust default font family for labels
-            size=14,  # Adjust default font size for labels
-            color="black"  # Adjust default font color for labels
-        ),
-        showlegend=False
-    )
+            title=f'Cinsiyet Dağılımları: {title}',
+            width=width, 
+            height=height,
+            title_font=dict(size=30, family=font_family, weight="bold"),
+            plot_bgcolor="#f3f4f6",
+            showlegend=False
+        )
 
     for annotation in fig['layout']['annotations']:
         annotation['y'] = 0.95  # Adjust this value for more/less padding
@@ -480,7 +539,7 @@ def population_mah_plot(df_p, city_name=None, town_name=None, district_name=None
     fig.add_annotation(
         text=f"Toplam Nüfus: <b>{sum(values1):,}</b>",
         xref="paper", yref="paper",
-        x=0.5, y=-0.2,
+        x=0.5, y=-0.1,
         showarrow=False,
         font=dict(size=18, family="Balto", color="black"),
         align="center"
@@ -552,6 +611,17 @@ def population_plot(df_p, city_code=0, width=None, height=500):
         )
     )
 
+    fig.update_layout(
+        width=width, 
+        height=height,
+        title_font=dict(size=30, family=font_family),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, gridcolor="lightgray", ),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, gridcolor="lightgray",),
+        plot_bgcolor="#f3f4f6",
+        xaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+    )
+
     # Update subplot titles font and style
 
     for annotation in fig['layout']['annotations']:
@@ -568,7 +638,7 @@ def population_plot(df_p, city_code=0, width=None, height=500):
 )
     return fig
 
-def price_age_plot(result: dict, data: list, width=None, height=500):
+def price_age_plot(result: dict, data: list, width=None, height=600):
     # Calculate min, max, median, and average prices from the result
     min_price = result["min_price"]
     max_price = result["max_price"]
@@ -644,10 +714,19 @@ def price_age_plot(result: dict, data: list, width=None, height=500):
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=1.00,
             xanchor="right",
             x=1
         )
+    )
+
+    fig_price.update_layout(
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, gridcolor="lightgray", ),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, gridcolor="lightgray",),
+        plot_bgcolor="#f3f4f6",
+        xaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
     )
 
     # Extract ages from the data field
@@ -677,17 +756,17 @@ def price_age_plot(result: dict, data: list, width=None, height=500):
     # Update layout for the age figure
     fig_age.update_layout(
         title_text="Bina Yaşı Dağılımı",
-        width=width,
+        legend=dict(orientation="h", yanchor="bottom", y=-.1, xanchor="center", x=.5),
+        width=width, 
         height=height,
-    )
+        title_font=dict(size=30, family=font_family, weight="bold"),
+        xaxis=dict(tickangle=-45, tickfont=dict(family=font_family, size=12), showgrid=True, gridcolor="lightgray", ),
+        yaxis=dict(tickfont=dict(family=font_family, size=12), tickformat=',', showgrid=True, gridcolor="lightgray",),
+        plot_bgcolor="#f3f4f6",
+        xaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
+        yaxis_title_font=dict(size=20, family=font_family, color='black', weight='bold'),
 
-    fig_age.update_layout(legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=-0.3,
-        xanchor="center",
-        x=.5
-    ))
+    )
 
     return fig_price, fig_age
 
