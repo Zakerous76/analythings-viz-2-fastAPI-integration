@@ -1,0 +1,282 @@
+import pandas as pd
+import json
+pd.set_option('future.no_silent_downcasting', True)
+
+
+city_codes = {
+    "yıl": "Yıl", "ay": "Ay", 'total': "Total", 'toplam - total':'toplam - total',
+    'adana': 1,
+    'ADıYAMAN': 2,
+    'AFYONKARAHiSAR': 3,
+    'AĞRı': 4,
+    'AMASYA': 5,
+    'ANKARA': 6,
+    'ANTALYA': 7,
+    'ARTViN': 8,
+    'AYDıN': 9,
+    'BALıKESiR': 10,
+    'BiLECiK': 11,
+    'BiNGÖL': 12,
+    'BiTLiS': 13,
+    'BOLU': 14,
+    'BURDUR': 15,
+    'BURSA': 16,
+    'ÇANAKKALE': 17,
+    'ÇANKıRı': 18,
+    'ÇORUM': 19,
+    'DENiZLi': 20,
+    'DiYARBAKıR': 21,
+    'EDiRNE': 22,
+    'ELAZıĞ': 23,
+    'ERZiNCAN': 24,
+    'ERZURUM': 25,
+    'ESKiŞEHiR': 26,
+    'GAZiANTEP': 27,
+    'GiRESUN': 28,
+    'GÜMÜŞHANE': 29,
+    'HAKKARi': 30,
+    'HATAY': 31,
+    'iSPARTA': 32,
+    'MERSiN': 33,
+    'İSTANBUL': 34,
+    'İZMiR': 35,
+    'KARS': 36,
+    'KASTAMONU': 37,
+    'KAYSERi': 38,
+    'kırklareli': 39,
+    'KıRŞEHiR': 40,
+    'KOCAELi': 41,
+    'KONYA': 42,
+    'KÜTAHYA': 43,
+    'MALATYA': 44,
+    'MANiSA': 45,
+    'KAHRAMANMARAŞ': 46,
+    'MARDiN': 47,
+    'MUĞLA': 48,
+    'MUŞ': 49,
+    'NEVŞEHiR': 50,
+    'NiĞDE': 51,
+    'ORDU': 52,
+    'RiZE': 53,
+    'SAKARYA': 54,
+    'SAMSUN': 55,
+    'SiiRT': 56,
+    'SiNOP': 57,
+    'SiVAS': 58,
+    'TEKiRDAĞ': 59,
+    'TOKAT': 60,
+    'TRABZON': 61,
+    'TUNCELi': 62,
+    'ŞANLıURFA': 63,
+    'UŞAK': 64,
+    'VAN': 65,
+    'YOZGAT': 66,
+    'ZONGULDAK': 67,
+    'AKSARAY': 68,
+    'BAYBURT': 69,
+    'KARAMAN': 70,
+    'KıRıKKALE': 71,
+    'BATMAN': 72,
+    'ŞıRNAK': 73,
+    'BARTıN': 74,
+    'ARDAHAN': 75,
+    'iĞDıR': 76,
+    'YALOVA': 77,
+    'KARABÜK': 78,
+    'KiLiS': 79,
+    'OSMANiYE': 80,
+    'DÜZCE': 81,
+    'Diğer iller - Other Provinces': 99}
+city_codes = {key.lower(): value for key, value in city_codes.items()}
+
+
+# Helper function to find the IDs from the reference data
+def find_ids(reference_data, city_name, town_name=None, quarter_name=None):
+    city_id, town_id, quarter_id = None, None, None
+    for city in reference_data:
+        if city['name'] == city_name:
+            city_id = city['id']
+
+            for town in city['towns']:
+                if town['name'] == town_name:
+                    town_id = town['id']
+
+                    for quarter in town['quarters']:
+                        if quarter['name'] == quarter_name:
+                            quarter_id = quarter['id']
+                            return city_id, town_id, quarter_id
+    return city_id, town_id, quarter_id
+    
+turkish_to_english = {
+    'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', "i̇": "i",
+    'Ç': 'C', 'Ğ': 'G', 'İ': 'I', 'Ö': 'O', 'Ş': 'S', 'Ü': 'U', ".": ""
+}
+def replace_turkish_chars(text):
+    text = text.lower()
+    for turkish_char, english_char in turkish_to_english.items():
+        text = text.replace(turkish_char, english_char)
+    return text
+
+def sales_cities():
+    """
+        This function cleans the "İllere göre konut satış sayısı.xls" data and creates a new excel file.
+
+        params:
+
+        
+        Excel file saved at [excel_file_path] with the following sheets:
+            df_totals_total (pandas_df): Total number of real estates sold in the country
+            df_totals_cities (pandas_df): Total number of real estates sold in each city
+            df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
+                in each month (monthly granularity)
+            df_granular_cities (pandas_df): df_granular without the "Total" column 
+    """
+    excel_file_path = "./datasets/sales_data.xlsx"
+
+
+    df = pd.read_excel("./datasets/İllere göre konut satış sayısı.xls")
+    df.rename(columns={df.columns[0]: "Yıl", df.columns[1]: "Ay", df.columns[2]: "Total"}, inplace=True)
+    df.ffill(inplace=True)
+    df['Yıl'] = df['Yıl'].astype(int)
+
+    df.columns = df.columns.map(lambda x: city_codes[x.lower()])
+
+    breakpoint_index = 12
+    df_totals_total = df.iloc[:breakpoint_index].copy()
+    df_totals_total['Yıl'] = df_totals_total['Yıl'].astype(str)
+    df_totals_total.at[breakpoint_index - 1, "Ay"] = df_totals_total.at[breakpoint_index - 1, "Ay"].split(" - ")[0]
+    df_totals_total.at[0, "Ay"] = "Ocak-Aralık"
+    df_totals_total.ffill(inplace=True)
+    df_totals_total['Yıl/Ay'] = df_totals_total[['Yıl', 'Ay']].agg('/'.join, axis=1)
+
+    df_totals_total = df_totals_total[["Yıl/Ay", "Total"]]
+    df_totals_cities = df.drop(columns=["Total", "Ay"]).iloc[:breakpoint_index].copy()
+    df_totals_cities.set_index("Yıl", inplace=True)
+
+    df_granular = df.iloc[breakpoint_index:].copy()
+
+    # Aggregating Yıl and Ay
+    month_mapping = {
+        'Ocak': 1, 'Şubat': 2, 'Mart': 3, 'Nisan': 4, 'Mayıs': 5, 'Haziran': 6,
+        'Temmuz': 7, 'Ağustos': 8, 'Eylül': 9, 'Ekim': 10, 'Kasım': 11, 'Aralık': 12
+    }
+
+    # Convert 'Yıl' and 'Ay' to datetime format
+    df_granular['Tarih'] = df_granular.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay'].split(" - ")[0]], 28), axis=1)
+    df_granular.drop(columns=['Yıl', 'Ay'], inplace=True)
+    df_granular.set_index("Tarih", inplace=True)
+    df_granular.sort_values(by='Tarih', inplace=True)
+
+
+    df_granular_cities = df_granular.drop("Total", axis=1)
+
+        # Save DataFrames to Excel
+    with pd.ExcelWriter(excel_file_path) as writer:
+        df_totals_total.to_excel(writer, sheet_name='totals_total')
+        df_totals_cities.to_excel(writer, sheet_name='totals_cities')
+        df_granular.to_excel(writer, sheet_name='granular')
+        df_granular_cities.to_excel(writer, sheet_name='granular_cities')
+
+
+def sales_cities_foreigners():
+    """
+        This function returns the number of real estates sold to foreigners in each city (İl)
+
+        params:
+            start_year (int): the starting year for the total number of sales in the country
+            end_year (int): the ending year for the total number of sales in the country
+
+        returns:
+            df_totals_total (pandas_df): Total number of real estates sold in the country
+            df_totals_cities (pandas_df): Total number of real estates sold in each city
+            df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
+                in each month (monthly granularity)
+            df_granular_cities (pandas_df): df_granular without the "Total" column 
+    """
+    excel_file_path = "./datasets/sales_foreigners_data.xlsx"
+
+    df_f = pd.read_excel("./datasets/İllere göre yabancılara konut satış sayısı.xls")
+    df_f.rename(columns={'Unnamed: 1': 'Şehir'}, inplace=True)
+    df_f_total = df_f[df_f['Şehir'] == "Toplam - Total"].drop(["Şehir", "Toplam"], axis=1)#.set_index("Yıl")
+    df_f_total["Yıl"] = df_f_total["Yıl"].astype(int)
+    df_f["Yıl"] = df_f["Yıl"].ffill().astype(int)
+    df_f.drop("Toplam", axis=1, inplace=True)
+
+    df_f['Şehir'] = df_f['Şehir'].map(lambda x: city_codes[x.lower()])
+
+
+    df_long = df_f_total.melt(id_vars=['Yıl'], var_name='Ay', value_name='Total')
+    df_f_total_aggregated = df_long.groupby(['Yıl', 'Ay']).sum().reset_index()
+    month_mapping = {
+        'Ocak': 1, 'Şubat': 2, 'Mart': 3, 'Nisan': 4, 'Mayıs': 5, 'Haziran': 6,
+        'Temmuz': 7, 'Ağustos': 8, 'Eylül': 9, 'Ekim': 10, 'Kasım': 11, 'Aralık': 12
+    }
+    df_f_total_aggregated['Tarih'] = df_f_total_aggregated.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay']], 1), axis=1)
+    df_f_total_aggregated.drop(columns=['Yıl', 'Ay'], inplace=True)
+    df_f_total_aggregated = df_f_total_aggregated.sort_values(by='Tarih')
+    df_f_total_aggregated.set_index("Tarih", inplace=True)
+    df_f_total_aggregated["Total"] = df_f_total_aggregated["Total"].astype(int)
+
+    df_f_cities = df_f[df_f['Şehir'] != "toplam - total"]
+    df_long = df_f_cities.melt(id_vars=['Yıl', 'Şehir'], var_name='Ay', value_name='Total')
+    df_f_cities_aggregated = df_long.groupby(['Yıl', 'Şehir', 'Ay']).sum().reset_index()
+    df_f_cities_aggregated['Tarih'] = df_f_cities_aggregated.apply(lambda row: pd.Timestamp(int(row['Yıl']), month_mapping[row['Ay']], 1), axis=1)
+    df_f_cities_aggregated.drop(columns=['Yıl', 'Ay'], inplace=True)
+    df_f_cities_aggregated = df_f_cities_aggregated.sort_values(by='Tarih')
+    df_f_cities_aggregated.set_index("Tarih", inplace=True)
+    df_f_cities_aggregated["Total"] = df_f_cities_aggregated["Total"].astype(int)
+
+    with pd.ExcelWriter(excel_file_path) as writer:
+        df_f_total_aggregated.to_excel(writer, sheet_name='df_f_total_aggregated')
+        df_f_cities_aggregated.to_excel(writer, sheet_name='df_f_cities_aggregated')
+
+
+def population():
+    excel_file_path = "./datasets/population_data.xlsx"
+    
+    df_p = pd.read_excel("./datasets/nüfus.xlsx",  sheet_name="MAHALLE NÜFUSU", index_col=0)
+    cols = ['il kayit no', 'ilçe kayit no', 'belde/köy kayit no', 'mahalle kayit no',
+    'il adi', 'ilçe adi', 'belediye adi', 'mahalle adi', 'mahallenin bağli olduğu belediyenin niteliği',
+    'toplam', 'erkek', 'kadin']
+    df_p.columns = cols
+
+    df_p = df_p[['il kayit no', 'ilçe kayit no', 'mahalle kayit no', "il adi", "ilçe adi", "mahalle adi", "erkek", "kadin"]]
+    df_p.erkek = df_p.erkek.replace("C", "0").astype(int)
+    df_p.kadin = df_p.kadin.replace("C", "0")
+    df_p.kadin = df_p.kadin.replace("-", "0").astype(int)
+    for col in ["il adi", "ilçe adi", "mahalle adi"]:
+        df_p[col + " cleaned"] = df_p[col].apply(lambda x: replace_turkish_chars(str(x)))
+
+    df_p = df_p.groupby(['il kayit no', 'ilçe kayit no', 'mahalle kayit no', "il adi", "ilçe adi", "mahalle adi", "il adi cleaned", "ilçe adi cleaned", "mahalle adi cleaned"])[["erkek", "kadin"]].sum().reset_index()
+
+    with open('./cities.json', 'r', encoding='utf-8') as file:
+        json_data = file.read()
+    reference_data = json.loads(json_data)
+
+    for city in reference_data:
+        city["name"] = replace_turkish_chars(city["name"])
+        for town in city["towns"]:
+            town["name"] = replace_turkish_chars(town["name"])
+
+            for quarter in town["quarters"]:
+                quarter["name"] = replace_turkish_chars(quarter["name"])
+                if ("mh" in quarter["name"]) or ("mah" in quarter["name"]) or ("mahalle" in quarter["name"]) or ("bld" in quarter["name"]):
+                    quarter["name"] = " ".join(quarter["name"].split()[:-1])
+    
+    # Update the DataFrame with IDs
+    for idx, row in df_p.iterrows():
+        city_name = row['il adi cleaned']
+        town_name = row['ilçe adi cleaned']
+        quarter_name = row['mahalle adi cleaned']
+        city_id, town_id, quarter_id = find_ids(reference_data, city_name, town_name, quarter_name)
+        df_p.at[idx, 'il kayit no'] = -1 if city_id is None else city_id
+        df_p.at[idx, 'ilçe kayit no'] = -2 if town_id is None else town_id
+        df_p.at[idx, 'mahalle kayit no'] = -3 if quarter_id is None else quarter_id
+
+    with pd.ExcelWriter(excel_file_path) as writer:
+        df_p.to_excel(writer, sheet_name='df_p')
+    
+if __name__ == "__main__":
+    sales_cities()
+    sales_cities_foreigners()
+    population()
