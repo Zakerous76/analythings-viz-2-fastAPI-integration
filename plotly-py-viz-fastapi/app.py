@@ -164,14 +164,19 @@ async def get_price_age_plot(plot_request: PriceAgePlotRequest):
 
 @app.get("/all") # with gender
 async def display_all():
-    return HTMLResponse(content=f"""{pio.to_html(total_sales_animate(df_granular), full_html=False)}<br>
-                        {pio.to_html(total_sales_plot(df_granular), full_html=False)}<br>
-                        {pio.to_html(total_sales_yearly_plot(df_granular_cities), full_html=False)}<br>
-                        {pio.to_html(total_sales_monthly_plot(df_granular_cities), full_html=False)}<br>
-                        {pio.to_html(total_sales_foreigners_animate(df_f_total_aggregated), full_html=False)}<br>
-                        {pio.to_html(total_sales_foreigners_plot(df_f_total_aggregated), full_html=False)}<br>
-                        {pio.to_html(total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0), full_html=False)}<br>
-                        {pio.to_html(population_mah_plot(df_p, city_name="", town_name="", district_name="", width=None, height=800), full_html=False)}<br>""")
+    return HTMLResponse(content=f"""
+        {pio.to_html(total_sales_animate(df_granular), full_html=False)}<br>
+        {pio.to_html(total_sales_plot(df_granular), full_html=False)}<br>
+        {pio.to_html(total_sales_yearly_plot(df_totals_cities), full_html=False)}<br>
+        {pio.to_html(total_sales_monthly_plot(df_granular_cities), full_html=False)}<br>
+        {pio.to_html(total_sales_foreigners_animate(df_f_total_aggregated), full_html=False)}<br>
+        {pio.to_html(total_sales_foreigners_plot(df_f_total_aggregated), full_html=False)}<br>
+        {pio.to_html(total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0), full_html=False)}<br>
+        {pio.to_html(population_mah_plot(df_p, city_name="", town_name="", district_name="", width=None, height=800), full_html=False)}<br>
+        {pio.to_html(price_plot_demo()[0], full_html=False)}<br>
+        {pio.to_html(price_plot_demo()[1], full_html=False)}<br>
+        """
+        )
 
 # ------------------------------------------------------------------------------------------------
 # Report
@@ -183,6 +188,17 @@ async def display_all():
 # TODO: Yaş Grubu ve Cinsiyete Göre İl/İlçe Merkezi ve Belde / Köy Nüfusu
 # TODO: Education Level
 
+def price_plot_demo():
+    import json
+    # Read the JSON file (replace with your JSON file path)
+    with open('./curl-res.json', 'r') as file:
+        json_data = file.read()
+
+    # Parse the JSON data
+    m = json.loads(json_data)
+
+    fig1, fig2 = price_age_plot(m["result"], m["data"])
+    return fig1, fig2
 
 
 if __name__ == "__main__":

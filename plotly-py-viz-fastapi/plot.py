@@ -27,6 +27,9 @@ design = dict(
 
     margin=dict(l=110, r=20, t=100, b=110),
 
+    title_x=0.5,
+    title_xanchor="center"
+
     # paper_bgcolor="rgb(0,0,0,0)",
 )
 
@@ -55,6 +58,8 @@ def design_animate(x_min, x_max, y_min, y_max):
 
         hovermode='x',
         legend=dict(font=dict(family=font_family, size=12), yanchor="top", y=0.99, xanchor="right", x=0.99),
+        title_x=0.5,
+        title_xanchor="center"
 ) 
 
 
@@ -576,10 +581,8 @@ def population_mah_plot(df_p, city_name="", town_name="", district_name="", widt
             title=f'Cinsiyet Dağılımları: {title}',
             width=width, 
             height=height,
-            title_font=dict(size=30, family=font_family, weight="bold"),
-            plot_bgcolor="#f3f4f6",
-            showlegend=False
         )
+    fig.update_layout(design)
 
     for annotation in fig['layout']['annotations']:
         annotation['y'] = 0.95  # Adjust this value for more/less padding
@@ -769,9 +772,9 @@ def price_age_plot(result: dict, data: list, width=None, height=600):
                             )
 
     # Create the vertical lines for lowest, average, and maximum prices
-    lowest_line = go.Scatter(x=[min_price, min_price], y=[0, max(y)], mode='lines', name='Minimum Fiyat', line=dict(color='red', dash='dash'))
-    average_line = go.Scatter(x=[avg_price, avg_price], y=[0, max(y)], mode='lines', name='Ortalama Fiyat', line=dict(color='green', dash='dash'))
-    highest_line = go.Scatter(x=[max_price, max_price], y=[0, max(y)], mode='lines', name='Maksimum Fiyat', line=dict(color='blue', dash='dash'))
+    lowest_line = go.Scatter(x=[min_price, min_price], y=[0, max(y)], mode='lines', name='Minimum Fiyat', line=dict(color='green', dash='dash'))
+    average_line = go.Scatter(x=[avg_price, avg_price], y=[0, max(y)], mode='lines', name='Ortalama Fiyat', line=dict(color='black', dash='dash'))
+    highest_line = go.Scatter(x=[max_price, max_price], y=[0, max(y)], mode='lines', name='Maksimum Fiyat', line=dict(color='red', dash='dash'))
 
     # Create the figure and add the histogram, bell curve, and vertical lines
     fig_price = go.Figure(data=[bell_curve, lowest_line, average_line, highest_line])
@@ -837,10 +840,9 @@ def price_age_plot(result: dict, data: list, width=None, height=600):
             age_groups["26-30"] += 1
         else:
             age_groups["31+"] += 1
-            age_groups[age] = 1
 
     total_ages = len(ages)
-    age_group_percentages = {group: count / total_ages * 100 for group, count in age_groups.items()}
+    age_group_percentages = {group: count / total_ages * 100 for group, count in age_groups.items() if count>0}
 
     # Create the age distribution pie chart
     labels = list(age_group_percentages.keys())
@@ -856,6 +858,7 @@ def price_age_plot(result: dict, data: list, width=None, height=600):
         legend=dict(orientation="h", yanchor="bottom", y=-.1, xanchor="center", x=.5),
         width=width, 
         height=height,
+        title_x=0.5,
     )
     fig_age.update_layout(design)
 
