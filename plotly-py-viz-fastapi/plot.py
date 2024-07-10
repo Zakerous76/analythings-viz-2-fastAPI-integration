@@ -4,6 +4,7 @@ from plotly.subplots import make_subplots
 import pandas as pd
 import scipy.stats as stats
 import numpy as np
+
 font_family="Verdana"
 line_width=5
 marker_size=12
@@ -487,14 +488,14 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code, width
         raise
 
 
-def population_mah_plot(df_p, city_name="", town_name="", district_name="", width=None, height=800):
+def population_mah_plot(df_p, city_code=0, town_code=0, quarter_code=0, width=None, height=800):
     # Create the figure with subplots
     labels = ['Erkek', 'Kadın']
     colors = ['skyblue', 'salmon']
     title = ""
     fig = go.Figure()
 
-    if city_name=="" and town_name=="" and district_name=="":
+    if city_code==0 and town_code==0 and quarter_code==0:
         title = "Bütün Ülke"
         values1 = df_p[["erkek", "kadin"]].sum().to_list()
         fig.add_trace(go.Pie(
@@ -508,9 +509,10 @@ def population_mah_plot(df_p, city_name="", town_name="", district_name="", widt
             textinfo='label+percent',  # Show labels and percentages
         ))
     
-    elif city_name!="" and (town_name=="" and district_name==""):
-        title = city_name.capitalize()
-        values1 = df_p[df_p["il adi"]==city_name.upper()]
+    elif city_code!=0 and (town_code==0 and quarter_code==0):
+        city_name = df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
+        title = f"{city_name}"        
+        values1 = df_p[df_p["il kayit no"]==city_code]
         values1 = values1[["erkek", "kadin"]].sum().to_list()
         fig.add_trace(go.Pie(
             name="",
@@ -523,9 +525,11 @@ def population_mah_plot(df_p, city_name="", town_name="", district_name="", widt
             textinfo='label+percent',  # Show labels and percentages
         ))
     
-    elif city_name!="" and (town_name!="" and district_name==""):
-        title = f"{city_name.capitalize()}, {town_name.capitalize()}"
-        values1 = df_p[(df_p["il adi"]==city_name.upper()) & (df_p["ilçe adi"]==town_name.upper())]
+    elif city_code!=0 and (town_code!=0 and quarter_code==0):
+        city_name = df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
+        town_name = df_p[df_p["ilçe kayit no"] == town_code]["ilçe adi"].iloc[0].capitalize()
+        title = f"{city_name}, {town_name}"
+        values1 = df_p[(df_p["il kayit no"]==city_code) & (df_p["ilçe kayit no"]==town_code)]
         values1 = values1[["erkek", "kadin"]].sum().to_list()
         fig.add_trace(go.Pie(
             name="",
@@ -538,11 +542,12 @@ def population_mah_plot(df_p, city_name="", town_name="", district_name="", widt
             textinfo='label+percent',  # Show labels and percentages
         ))
     
-    elif city_name!="" and (town_name!="" and district_name!=""):
-        title = f"{city_name.capitalize()}, {town_name.capitalize()}, {district_name.capitalize()} Mh."
-        if len(district_name.split()) > 1:
-            district_name = district_name + " Mh."
-        values1 = df_p[(df_p["il adi"]==city_name.upper()) & (df_p["ilçe adi"]==town_name.upper()) & (df_p["mahalle adi"]==" ".join(district_name.split()[:-1]).upper())] # assuming that every mahalle ends with MH.
+    elif city_code!=0 and (town_code!=0 and quarter_code!=0):
+        city_name = df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
+        town_name = df_p[df_p["ilçe kayit no"] == town_code]["ilçe adi"].iloc[0].capitalize()
+        quarter_name = df_p[df_p["mahalle kayit no"] == quarter_code]["mahalle adi"].iloc[0].capitalize()
+        title = f"{city_name}, {town_name}, {quarter_name} Mh."
+        values1 = df_p[(df_p["il kayit no"]==city_code) & (df_p["ilçe kayit no"]==town_code) & (df_p["mahalle kayit no"]==quarter_code)]
         values1 = values1[["erkek", "kadin"]].sum().to_list()
         fig.add_trace(go.Pie(
             name="",

@@ -38,6 +38,7 @@ def create_html_form_pop(label, action, input_names):
         input_fields += f'<label for="{name}">{name.capitalize()}:</label>'
         input_fields += f'<input type="text" id="{name}" name="{name}">'
     form_html = f"""
+    <h3>{label.split()[0]}</h3>
     <form action="{action}" method="get">
         {input_fields}
         <input type="submit" value="Submit">
@@ -63,17 +64,17 @@ async def get_home():
     </html>
     """
     buttons = [
+        create_html_button("DISPLAY ALL", "/all"),
         create_html_button("Total Sales (Animate)", "/total_sales_animate"),
         create_html_button("Sales by Cities (Animate)", "/sales_by_cities_animate"),
         create_html_button("Total Sales to Foreigners (Animate)", "/total_sales_to_foreigners_animate"),
-        create_html_button("Display All", "/all"),
     ]
     forms = [
         create_html_form("Total Sales (start_year end_year)", "/total_sales", "interval"),
         create_html_form("Total Sales Yearly (city_code)", "/total_sales_yearly", "city_code"),
         create_html_form("Total Sales Monthly (city_code)", "/total_sales_monthly", "city_code"),
         create_html_form("Total Sales Monthly Foreigners (city_code)", "/total_sales_monthly_foreigners", "city_code"),
-        create_html_form_pop("Population (city_name, town_name, district_name)", "/population_mah_plot", ["city_name", "town_name", "district_name"])
+        create_html_form_pop("Population (city_code, town_code, quarter_code)", "/population_mah_plot", ["city_code", "town_code", "quarter_code"])
     ]
     return HTMLResponse(content=html_content.format(buttons=" ".join(buttons), forms=" ".join(forms)))
 
@@ -139,10 +140,10 @@ async def get_total_sales_monthly_foreigners(city_code: int = Query(0, title="Ci
 
 # how to get more than parameters
 @app.get("/population_mah_plot")
-async def get_population_mah_plot(city_name: str = Query(None, title="City Name", description="Name of the city"),
-                                  town_name: str = Query(None, title="Town Name", description="Name of the town"),
-                                  district_name: str = Query(None, title="District Name", description="Name of the district")):
-    fig = population_mah_plot(df_p, city_name, town_name, district_name)
+async def get_population_mah_plot(city_code: int = Query(0, title="City Code", description="Code of the city"),
+                                  town_code: int = Query(0, title="Town Code", description="Code of the town"),
+                                  quarter_code: int = Query(0, title="Quarter code", description="Code of the quarter")):
+    fig = population_mah_plot(df_p, city_code, town_code, quarter_code)
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"{graph_html}")
 
@@ -172,9 +173,13 @@ async def display_all():
         {pio.to_html(total_sales_foreigners_animate(df_f_total_aggregated), full_html=False)}<br>
         {pio.to_html(total_sales_foreigners_plot(df_f_total_aggregated), full_html=False)}<br>
         {pio.to_html(total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0), full_html=False)}<br>
-        {pio.to_html(population_mah_plot(df_p, city_name="", town_name="", district_name="", width=None, height=800), full_html=False)}<br>
+        il kayit no	ilçe kayit no	mahalle kayit no	erkek	kadin<br>
+        81	957	51224	DÜZCE	KAYNAŞLI	KARAÇALI	1030	1054<br>
+        {pio.to_html(population_mah_plot(df_p, city_code=81, town_code=957, quarter_code=51224, width=None, height=800), full_html=False)}<br>
         {pio.to_html(price_plot_demo()[0], full_html=False)}<br>
         {pio.to_html(price_plot_demo()[1], full_html=False)}<br>
+
+
         """
         )
 
