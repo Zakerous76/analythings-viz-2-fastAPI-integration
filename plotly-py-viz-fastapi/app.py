@@ -66,6 +66,7 @@ async def get_home():
         create_html_button("Total Sales (Animate)", "/total_sales_animate"),
         create_html_button("Sales by Cities (Animate)", "/sales_by_cities_animate"),
         create_html_button("Total Sales to Foreigners (Animate)", "/total_sales_to_foreigners_animate"),
+        create_html_button("Display All", "/all"),
     ]
     forms = [
         create_html_form("Total Sales (start_year end_year)", "/total_sales", "interval"),
@@ -159,6 +160,18 @@ async def get_price_age_plot(plot_request: PriceAgePlotRequest):
         return HTMLResponse(content=f"{price_html}{age_html}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating plots: {str(e)}")
+
+
+@app.get("/all") # with gender
+async def display_all():
+    return HTMLResponse(content=f"""{pio.to_html(total_sales_animate(df_granular), full_html=False)}<br>
+                        {pio.to_html(total_sales_plot(df_granular), full_html=False)}<br>
+                        {pio.to_html(total_sales_yearly_plot(df_granular_cities), full_html=False)}<br>
+                        {pio.to_html(total_sales_monthly_plot(df_granular_cities), full_html=False)}<br>
+                        {pio.to_html(total_sales_foreigners_animate(df_f_total_aggregated), full_html=False)}<br>
+                        {pio.to_html(total_sales_foreigners_plot(df_f_total_aggregated), full_html=False)}<br>
+                        {pio.to_html(total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0), full_html=False)}<br>
+                        {pio.to_html(population_mah_plot(df_p, city_name="", town_name="", district_name="", width=None, height=800), full_html=False)}<br>""")
 
 # ------------------------------------------------------------------------------------------------
 # Report
