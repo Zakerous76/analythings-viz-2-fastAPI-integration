@@ -6,6 +6,8 @@ import scipy.stats as stats
 import numpy as np
 font_family="Verdana"
 line_width=5
+marker_size=12
+teal_like = "#233d4d"
 design = dict(
     title_font=dict(size=30, family=font_family, weight="bold"),
     
@@ -154,10 +156,18 @@ def total_sales_animate(df_granular, width=None, height=800):
     fig = go.Figure(layout=dict(height=height, width=width))
 
     # Initial empty plot
-    fig.add_trace(go.Scatter(x=df_granular.index, y=[None]*len(df_granular), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Toplam Konut Satış'))
+    fig.add_trace(go.Scatter(
+        x=df_granular.index, 
+        y=[None]*len(df_granular), 
+        mode="lines+markers", 
+        line=dict(color='orange', width=line_width), 
+        marker=dict(color=teal_like, size=marker_size), name='Ülkede Toplam Konut Satış')
+        )
+
 
     # Define frames for animation
-    frames = [go.Frame(data=[go.Scatter(x=df_granular.index[:k+1], y=df_granular['Total'][:k+1])], name=str(k)) for k in range(len(df_granular))]
+    frames = [go.Frame(data=[
+        go.Scatter(x=df_granular.index[:k+1], y=df_granular['Total'][:k+1])], name=str(k)) for k in range(len(df_granular))]
 
     fig.frames = frames
 
@@ -229,7 +239,15 @@ def total_sales_plot(df_granular, width=None, height=800):
     fig = go.Figure(layout=dict(height=height, width=width))
 
     # Initial empty plot
-    fig.add_trace(go.Scatter(x=df_granular.index, y=df_granular["Total"], mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Toplam Konut Satış'))
+    fig.add_trace(go.Scatter(
+        x=df_granular.index, 
+        y=df_granular["Total"], 
+        mode="lines+markers", 
+        line=dict(color="orange", width=line_width), marker=dict(color="teal", size=10), 
+        # line=dict(color=teal_like, width=line_width), marker=dict(color="orange", size=10), 
+
+        name='Ülkede Toplam Konut Satış')
+        )
 
     # Update layout with buttons and animation settings
     fig.update_layout(
@@ -246,12 +264,27 @@ def total_sales_yearly_plot(df_totals_cities, city_code=0, width=None, height=80
         City must be spelled properly
     """
     if city_code == 0:
-        fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_totals_cities.index, y=df_totals_cities[city]) for city in df_totals_cities.columns], 
-                    layout=dict(height=height, width=width))
+        fig = go.Figure(data=
+                        [go.Scatter(
+                            name=city_code_map[city], 
+                            x=df_totals_cities.index, 
+                            y=df_totals_cities[city],
+                            line=dict(width=line_width)
+                            ) for city in df_totals_cities.columns
+                        ], 
+                        layout=dict(height=height, width=width)
+                        )
         fig.update_layout(title="İllere Göre Konut Satışı (Yıl Bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
         fig.update_xaxes(tickmode='linear')    
     else:
-        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_totals_cities.index, y=df_totals_cities[city_code])], layout=dict(height=height, width=width))
+        fig = go.Figure(data=
+                        [go.Scatter(
+                            name=city_code_map[city_code], 
+                            x=df_totals_cities.index, 
+                            y=df_totals_cities[city_code],
+                            line=dict(color=teal_like, width=line_width))
+                        ], 
+                        layout=dict(height=height, width=width))
         fig.update_layout(title=f"Konut Satışı (Yıl Bazında): {city_code_map[city_code].capitalize()}", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
         fig.update_xaxes(tickmode='linear') 
 
@@ -265,12 +298,27 @@ def total_sales_monthly_plot(df_granular_cities, city_code=0, width=None, height
         City must be spelled properly
     """
     if city_code == 0:
-        fig = go.Figure(data=[go.Scatter(name=city_code_map[city], x=df_granular_cities.index, y=df_granular_cities[city]) for city in df_granular_cities.columns], 
-                layout=dict(height=height, width=width))
-        fig.update_layout(title="İllere Göre Konut Satışı (Ay bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')
-  
+        fig = go.Figure(data=
+                        [go.Scatter(
+                            name=city_code_map[city], 
+                            x=df_granular_cities.index, 
+                            y=df_granular_cities[city],
+                            line=dict(width=line_width),
+                            ) for city in df_granular_cities.columns
+                        ],
+                        layout=dict(height=height, width=width)
+                        )
+        fig.update_layout(title="İllere Göre Konut Satışı (Ay bazında)", xaxis_title="Yıl", yaxis_title="Toplam Konut Satışı", barmode='stack')  
     else:
-        fig = go.Figure(data=[go.Scatter(name=city_code_map[city_code], x=df_granular_cities.index, y=df_granular_cities[city_code])], layout=dict(height=height, width=width))
+        fig = go.Figure(data=
+                        [go.Scatter(
+                            name=city_code_map[city_code], 
+                            x=df_granular_cities.index, 
+                            y=df_granular_cities[city_code],
+                            line=dict(width=line_width)
+                            )
+                        ], 
+                        layout=dict(height=height, width=width))
         fig.update_layout(title=f"Konut Satışı (Ay Bazında): {city_code_map[city_code].capitalize()}", yaxis_title="Toplam Konut Satışı", barmode='stack')
     
     fig.update_layout(design)
@@ -290,7 +338,7 @@ def total_sales_foreigners_animate(df_f_total_aggregated, width=None, height=800
     fig = go.Figure(layout=dict(height=height, width=width))
 
     # Initial empty plot
-    fig.add_trace(go.Scatter(x=df_f_total_aggregated.index, y=[None]*len(df_f_total_aggregated), mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Yabancılara Toplam Konut Satış'))
+    fig.add_trace(go.Scatter(x=df_f_total_aggregated.index, y=[None]*len(df_f_total_aggregated), mode="lines+markers", line=dict(color='orange', width=line_width), marker=dict(color="teal", size=marker_size), name='Ülkede Yabancılara Toplam Konut Satış'))
 
     # Define frames for animation
     frames = [go.Frame(data=[go.Scatter(x=df_f_total_aggregated.index[:k+1], y=df_f_total_aggregated['Total'][:k+1])], name=str(k)) for k in range(len(df_f_total_aggregated))]
@@ -364,10 +412,14 @@ def total_sales_foreigners_plot(df_f_total_aggregated, width=None, height=800):
     # Create figure
     fig = go.Figure(layout=dict(height=height, width=width))
 
-    # Initial empty plot
-    fig.add_trace(go.Scatter(x=df_f_total_aggregated.index, y=df_f_total_aggregated["Total"], mode="lines+markers", line=dict(color='orange'), marker=dict(color="teal"), name='Ülkede Yabancılara Toplam Konut Satış'))
+    fig.add_trace(go.Scatter(
+        x=df_f_total_aggregated.index, 
+        y=df_f_total_aggregated["Total"], 
+        mode="lines+markers", 
+        line=dict(color='orange', width=line_width), 
+        marker=dict(color="teal", size=marker_size), 
+        name='Ülkede Yabancılara Toplam Konut Satış'))
 
-    # Update layout with buttons and animation settings
     fig.update_layout(
         title=f'Ülkede Yabancılara Toplam Konut Satış ({df_f_total_aggregated.index.min().year}-{df_f_total_aggregated.index.max().year})',
         xaxis_title='Tarih',
@@ -385,26 +437,50 @@ def total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code, width
     fig = go.Figure()
     try:
         if city_code == 0:
-            fig = px.line(df_f_cities_aggregated, x=df_f_cities_aggregated.index, 
-                            y='Total', color='Şehir', title='İllere Göre Yabancılara Konut Satışı (Ay Bazında)')
+            for city in df_f_cities_aggregated['Şehir'].unique():
+                city_data = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city]
+                fig.add_trace(go.Scatter(
+                    x=city_data.index,
+                    y=city_data['Total'],
+                    mode='lines',
+                    name=str(city_code_map.get(city)),
+                    line=dict(width=line_width)
+                ))
+            fig.update_layout(title='İllere Göre Yabancılara Konut Satışı (Ay Bazında)')
         else:
             p_city_code = city_code
             if city_code not in city_code_f:
                 city_code = 99
             dff = df_f_cities_aggregated[df_f_cities_aggregated['Şehir'] == city_code]
+            city_name = city_code_map.get(p_city_code, "Diğer Şehirler")
             
-            fig = px.line(dff, x=dff.index, y='Total', color='Şehir', title=f'Yabancılara Konut Satışı (Ay Bazında): {city_code_map[p_city_code].capitalize()}',
-                            color_discrete_sequence=px.colors.qualitative.Vivid)
-            fig.update_layout(showlegend=False)
+            fig.add_trace(go.Scatter(
+                x=dff.index,
+                y=dff['Total'],
+                mode='lines',
+                name=city_name,
+                line=dict(width=line_width, color='blue')  # You can customize the color as needed
+            ))
+            fig.update_layout(
+                title=f'Yabancılara Konut Satışı (Ay Bazında): {city_name.capitalize()}',
+                showlegend=False
+                )
+
         fig.update_layout(
             width=width, 
             height=height,
+            xaxis_title='Tarih',
+            yaxis_title='Toplam',
         )
+
+        # Apply additional design settings if needed
         fig.update_layout(design)
+        
         return fig
     except Exception as e:
         print(f"Error in plot function: {e}")
         raise
+
 
 def population_mah_plot(df_p, city_name="", town_name="", district_name="", width=None, height=800):
     # Create the figure with subplots
