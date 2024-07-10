@@ -2,8 +2,10 @@ import plotly.graph_objs as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
-
+import scipy.stats as stats
+import numpy as np
 font_family="Verdana"
+line_width=5
 design = dict(
     title_font=dict(size=30, family=font_family, weight="bold"),
     
@@ -611,69 +613,97 @@ def population_plot(df_p, city_code=0, width=None, height=500):
 
 def price_age_plot(result: dict, data: list, width=None, height=600):
     # Calculate min, max, median, and average prices from the result
+    real_estate_prices = [item['price'] for item in data]
     min_price = result["min_price"]
     max_price = result["max_price"]
     avg_price = result["avg_price"]
 
-    # Create traces for price statistics
-    traces = []
+    """     # Create traces for price statistics
+        traces = []
 
-    traces.append(go.Scatter(
-        x=[min_price, max_price],
-        y=[1, 1],
-        mode='lines',
-        line=dict(color='black', width=2),
-        showlegend=False,
-        name=""
-    ))
+        traces.append(go.Scatter(
+            x=[min_price, max_price],
+            y=[1, 1],
+            mode='lines',
+            line=dict(color='black', width=2),
+            showlegend=False,
+            name=""
+        ))
 
-    traces.append(go.Scatter(
-        x=[min_price, avg_price, max_price],
-        y=[1, 1, 1],
-        mode='markers+text',
-        text=[f'{min_price:,} TL', f'{avg_price:,.0f} TL', f'{max_price:,} TL'],
-        textposition='top center',
-        marker=dict(color=['green', 'blue', 'red'], size=10),
-        name="",
-        showlegend=False,
-        hovertemplate='%{x:,.0f} TL'
-    ))
+        traces.append(go.Scatter(
+            x=[min_price, avg_price, max_price],
+            y=[1, 1, 1],
+            mode='markers+text',
+            text=[f'{min_price:,} TL', f'{avg_price:,.0f} TL', f'{max_price:,} TL'],
+            textposition='top center',
+            marker=dict(color=['green', 'blue', 'red'], size=10),
+            name="",
+            showlegend=False,
+            hovertemplate='%{x:,.0f} TL'
+        ))
 
-    # Min price trace
-    traces.append(go.Scatter(
-        x=[min_price],
-        y=[1],
-        mode='markers',
-        marker=dict(color='green', size=10, symbol='square'),
-        name='Min',
-        showlegend=True,
-        hovertemplate='%{x:,.0f} TL'
-    ))
+        # Min price trace
+        traces.append(go.Scatter(
+            x=[min_price],
+            y=[1],
+            mode='markers',
+            marker=dict(color='green', size=10, symbol='square'),
+            name='Min',
+            showlegend=True,
+            hovertemplate='%{x:,.0f} TL'
+        ))
 
-    # Average price trace
-    traces.append(go.Scatter(
-        x=[avg_price],
-        y=[1],
-        mode='markers',
-        marker=dict(color='blue', size=10, symbol='square'),
-        name='Ortalama',
-        showlegend=True,
-        hovertemplate='%{x:,.0f} TL'
-    ))
+        # Average price trace
+        traces.append(go.Scatter(
+            x=[avg_price],
+            y=[1],
+            mode='markers',
+            marker=dict(color='blue', size=10, symbol='square'),
+            name='Ortalama',
+            showlegend=True,
+            hovertemplate='%{x:,.0f} TL'
+        ))
 
-    # Max price trace
-    traces.append(go.Scatter(
-        x=[max_price],
-        y=[1],
-        mode='markers',
-        marker=dict(color='red', size=10, symbol='square'),
-        name='Maks',
-        showlegend=True,
-        hovertemplate='%{x:,.0f} TL'
-    ))
-
+        # Max price trace
+        traces.append(go.Scatter(
+            x=[max_price],
+            y=[1],
+            mode='markers',
+            marker=dict(color='red', size=10, symbol='square'),
+            name='Maks',
+            showlegend=True,
+            hovertemplate='%{x:,.0f} TL'
+        ))
+    """
     # Create the price figure
-    fig_price = go.Figure(data=traces)
+    
+    # Create the histogram
+    hist_data = go.Histogram(x=real_estate_prices, nbinsx=30, name='', opacity=0.7)
+
+    # Calculate the bell curve (normal distribution)
+    mean = avg_price
+    std_dev = np.std(real_estate_prices)
+    x = np.linspace(min_price, max_price, 1000)
+    y = stats.norm.pdf(x, mean, std_dev) * len(real_estate_prices) * (x[1] - x[0]) * 30  # scale y to match histogram
+
+    # Create the normal distribution curve
+    bell_curve = go.Scatter(x=x, y=y, mode='lines', name='Normal Dağılım', 
+                            hovertemplate="%{x:,.0f} TL",
+                            line=dict(width=line_width),  # Increase the width of the line
+                            )
+
+    # Create the vertical lines for lowest, average, and maximum prices
+    lowest_line = go.Scatter(x=[min_price, min_price], y=[0, max(y)], mode='lines', name='Minimum Fiyat', line=dict(color='red', dash='dash'))
+    average_line = go.Scatter(x=[avg_price, avg_price], y=[0, max(y)], mode='lines', name='Ortalama Fiyat', line=dict(color='green', dash='dash'))
+    highest_line = go.Scatter(x=[max_price, max_price], y=[0, max(y)], mode='lines', name='Maksimum Fiyat', line=dict(color='blue', dash='dash'))
+
+    # Create the figure and add the histogram, bell curve, and vertical lines
+    fig_price = go.Figure(data=[bell_curve, lowest_line, average_line, highest_line])
+
+    # Add annotations for the lowest, average, and maximum prices
+    fig_price.add_annotation(x=min_price, y=max(y), text=f"Minimum Fiyat: {min_price:,.0f} TL", showarrow=True, arrowhead=1)
+    fig_price.add_annotation(x=avg_price, y=max(y), text=f"Ortalama Fiyat: {avg_price:,.0f} TL", showarrow=True, arrowhead=1)
+    fig_price.add_annotation(x=max_price, y=max(y), text=f"Maksimum Fiyat: {max_price:,.0f} TL", showarrow=True, arrowhead=1)
 
     # Update layout for the price figure
     fig_price.update_layout(
@@ -681,7 +711,8 @@ def price_age_plot(result: dict, data: list, width=None, height=600):
         xaxis_title="Fiyat (TL)",
         yaxis=dict(showticklabels=False, showgrid=False),  # Hide the y-axis ticks and labels
         width=width,
-        height=230,
+        height=500,
+        bargap=0.2,  # Gap between bars
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -690,23 +721,49 @@ def price_age_plot(result: dict, data: list, width=None, height=600):
             x=1
         )
     )
-
+    
     fig_price.update_layout(design)
 
     # Extract ages from the data field
     ages = [item['age'] for item in data]
     ages = sorted(ages)
 
-    # Calculate age group percentages
-    age_groups = {}
-    total_ages = len(ages)
 
+    # Define age groups
+    age_groups = {
+        0:0,
+        1:0,
+        2:0,
+        3:0,
+        4:0,
+        5:0,
+        "6-10":0,
+        "11-15":0,
+        "16-20":0,
+        "21-25":0,
+        "26-30":0,
+        "31+":0,
+    }
+
+    # Categorize ages
     for age in ages:
-        if age in age_groups:
+        if age<6:
             age_groups[age] += 1
+        elif 6<=age<=10:
+            age_groups["6-10"] += 1
+        elif 11<=age<=15:
+            age_groups["11-15"] += 1
+        elif 16<=age<=20:
+            age_groups["16-20"] += 1
+        elif 21<=age<=25:
+            age_groups["21-25"] += 1
+        elif 26<=age<=30:
+            age_groups["26-30"] += 1
         else:
+            age_groups["31+"] += 1
             age_groups[age] = 1
 
+    total_ages = len(ages)
     age_group_percentages = {group: count / total_ages * 100 for group, count in age_groups.items()}
 
     # Create the age distribution pie chart
