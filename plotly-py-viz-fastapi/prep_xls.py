@@ -2,9 +2,8 @@ import pandas as pd
 import json
 pd.set_option('future.no_silent_downcasting', True)
 
-
 city_codes = {
-    "yıl": "Yıl", "ay": "Ay", 'total': "Total", 'toplam - total':'toplam - total',
+    "yıl": "Yıl", "ay": "Ay", 'total': "Total", 'toplam - total':'toplam - total', "il": "il", "toplam": "toplam", "toplam-total": "toplam",
     'adana': 1,
     'ADıYAMAN': 2,
     'AFYONKARAHiSAR': 3,
@@ -88,7 +87,6 @@ city_codes = {
     'DÜZCE': 81,
     'Diğer iller - Other Provinces': 99}
 city_codes = {key.lower(): value for key, value in city_codes.items()}
-
 
 # Helper function to find the IDs from the reference data
 def find_ids(reference_data, city_name, town_name=None, quarter_name=None):
@@ -306,6 +304,18 @@ def population_marital():
         df_divorced.to_excel(writer, sheet_name='df_divorced')
         df_widowed.to_excel(writer, sheet_name='df_widowed')
     
+def population_origin_city():
+    input_file_path = "./datasets/ikamet edilen ile gore nufus kutugune kayitli olunan il.xls"
+    output_file_path = "./datasets/population_based_on_origin_city.xlsx"
+    df_origin_city = pd.read_excel(input_file_path)
+    df_origin_city.rename(columns={"Unnamed: 0": "il", "Toplam\nTotal": "toplam"}, inplace=True)
+    df_origin_city.columns = df_origin_city.columns.map(lambda x: city_codes[x.lower()])
+    df_origin_city.il = df_origin_city.il.map(lambda x: city_codes[x.lower()])
+    df_origin_city.set_index("il", inplace=True)
+    with pd.ExcelWriter(output_file_path) as writer:
+        df_origin_city.to_excel(writer, sheet_name='df_origin_city')
+
+
 if __name__ == "__main__":
     sales_cities()
     sales_cities_foreigners()
