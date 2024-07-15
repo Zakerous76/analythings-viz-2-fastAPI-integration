@@ -277,6 +277,34 @@ def population():
 
     with pd.ExcelWriter(output_file_path) as writer:
         df_p.to_excel(writer, sheet_name='df_p')
+
+def population_marital():
+    input_file_path = './datasets/il medeni durum ve cinsiyete gore nufus.xls'  # Replace with the correct file path
+    output_file_path = "./datasets/population_marital_data.xlsx"
+    
+    df_origin_city = pd.read_excel(input_file_path, header=[0, 1])
+    
+    df_origin_city.set_index(('İl-Provinces', 'Unnamed: 0_level_1'), inplace=True)
+    df_origin_city.index.rename("İl", inplace=True)
+    df_origin_city.index = df_origin_city.index.map(lambda x: city_codes[x.lower()])
+
+    df_never_married = df_origin_city["Hiç evlenmedi-Never married"].drop("Kadın\nFemale.1", axis=1)
+    df_never_married.rename(columns={'Toplam\nTotal': 'toplam', "Erkek\nMale": "erkek", "Kadın\nFemale": "kadın"}, inplace=True)
+    
+    df_married = df_origin_city['Evli-Married'].drop("Kadın\nFemale.1", axis=1)
+    df_married.rename(columns={'Toplam\nTotal': 'toplam', "Erkek\nMale": "erkek", "Kadın\nFemale": "kadın"}, inplace=True)
+    
+    df_divorced = df_origin_city['Boşandı-Divorced'].drop("Kadın\nFemale.1", axis=1)
+    df_divorced.rename(columns={'Toplam\nTotal': 'toplam', "Erkek\nMale": "erkek", "Kadın\nFemale": "kadın"}, inplace=True)
+    
+    df_widowed = df_origin_city['Eşi öldü-Widowed']
+    df_widowed.rename(columns={'Toplam\nTotal': 'toplam', "Erkek\nMale": "erkek", "Kadın\nFemale": "kadın"}, inplace=True)
+
+    with pd.ExcelWriter(output_file_path) as writer:
+        df_never_married.to_excel(writer, sheet_name='df_never_married')
+        df_married.to_excel(writer, sheet_name='df_married')
+        df_divorced.to_excel(writer, sheet_name='df_divorced')
+        df_widowed.to_excel(writer, sheet_name='df_widowed')
     
 if __name__ == "__main__":
     sales_cities()
