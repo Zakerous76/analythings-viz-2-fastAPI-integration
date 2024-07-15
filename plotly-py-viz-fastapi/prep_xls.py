@@ -131,10 +131,10 @@ def sales_cities():
                 in each month (monthly granularity)
             df_granular_cities (pandas_df): df_granular without the "Total" column 
     """
-    excel_file_path = "./datasets/sales_data.xlsx"
+    input_file_path = "./datasets/İllere göre konut satış sayısı.xls"
+    output_file_path = "./datasets/sales_data.xlsx"
 
-
-    df = pd.read_excel("./datasets/İllere göre konut satış sayısı.xls")
+    df = pd.read_excel(input_file_path)
     df.rename(columns={df.columns[0]: "Yıl", df.columns[1]: "Ay", df.columns[2]: "Total"}, inplace=True)
     df.ffill(inplace=True)
     df['Yıl'] = df['Yıl'].astype(int)
@@ -171,7 +171,7 @@ def sales_cities():
     df_granular_cities = df_granular.drop("Total", axis=1)
 
         # Save DataFrames to Excel
-    with pd.ExcelWriter(excel_file_path) as writer:
+    with pd.ExcelWriter(output_file_path) as writer:
         df_totals_total.to_excel(writer, sheet_name='totals_total')
         df_totals_cities.to_excel(writer, sheet_name='totals_cities')
         df_granular.to_excel(writer, sheet_name='granular')
@@ -193,9 +193,10 @@ def sales_cities_foreigners():
                 in each month (monthly granularity)
             df_granular_cities (pandas_df): df_granular without the "Total" column 
     """
-    excel_file_path = "./datasets/sales_foreigners_data.xlsx"
+    input_file_path = "./datasets/İllere göre yabancılara konut satış sayısı.xls"
+    output_file_path = "./datasets/sales_foreigners_data.xlsx"
 
-    df_f = pd.read_excel("./datasets/İllere göre yabancılara konut satış sayısı.xls")
+    df_f = pd.read_excel(input_file_path)
     df_f.rename(columns={'Unnamed: 1': 'Şehir'}, inplace=True)
     df_f_total = df_f[df_f['Şehir'] == "Toplam - Total"].drop(["Şehir", "Toplam"], axis=1)#.set_index("Yıl")
     df_f_total["Yıl"] = df_f_total["Yıl"].astype(int)
@@ -226,15 +227,16 @@ def sales_cities_foreigners():
     df_f_cities_aggregated.set_index("Tarih", inplace=True)
     df_f_cities_aggregated["Total"] = df_f_cities_aggregated["Total"].astype(int)
 
-    with pd.ExcelWriter(excel_file_path) as writer:
+    with pd.ExcelWriter(output_file_path) as writer:
         df_f_total_aggregated.to_excel(writer, sheet_name='df_f_total_aggregated')
         df_f_cities_aggregated.to_excel(writer, sheet_name='df_f_cities_aggregated')
 
 
 def population():
-    excel_file_path = "./datasets/population_data.xlsx"
+    input_file_path = "./datasets/nüfus.xlsx"
+    output_file_path = "./datasets/population_data.xlsx"
     
-    df_p = pd.read_excel("./datasets/nüfus.xlsx",  sheet_name="MAHALLE NÜFUSU", index_col=0)
+    df_p = pd.read_excel(input_file_path,  sheet_name="MAHALLE NÜFUSU", index_col=0)
     cols = ['il kayit no', 'ilçe kayit no', 'belde/köy kayit no', 'mahalle kayit no',
     'il adi', 'ilçe adi', 'belediye adi', 'mahalle adi', 'mahallenin bağli olduğu belediyenin niteliği',
     'toplam', 'erkek', 'kadin']
@@ -273,7 +275,7 @@ def population():
         df_p.at[idx, 'ilçe kayit no'] = -2 if town_id is None else town_id
         df_p.at[idx, 'mahalle kayit no'] = -3 if quarter_id is None else quarter_id
 
-    with pd.ExcelWriter(excel_file_path) as writer:
+    with pd.ExcelWriter(output_file_path) as writer:
         df_p.to_excel(writer, sheet_name='df_p')
     
 if __name__ == "__main__":
