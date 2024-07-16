@@ -150,8 +150,28 @@ def population_df():
     excel_file_path = "./datasets/population_data.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_p = pd.read_excel(xls, sheet_name='df_p', index_col=0)
-
     return df_p
+
+def population_marital_df():
+    excel_file_path = "./datasets/population_marital_data.xlsx"
+    with pd.ExcelFile(excel_file_path) as xls:
+        df_never_married = pd.read_excel(xls, sheet_name='df_never_married', index_col=0)
+        df_married = pd.read_excel(xls, sheet_name='df_married', index_col=0)
+        df_divorced = pd.read_excel(xls, sheet_name='df_divorced', index_col=0)
+        df_widowed = pd.read_excel(xls, sheet_name='df_widowed', index_col=0)
+    return df_never_married, df_married, df_divorced, df_widowed
+
+def population_origin_city_df():
+    excel_file_path = "./datasets/population_based_on_origin_city.xlsx"
+    with pd.ExcelFile(excel_file_path) as xls:
+        df_origin_city = pd.read_excel(xls, sheet_name='df_origin_city', index_col=0)
+    return df_origin_city
+
+def population_trend_df():
+    excel_file_path = "./datasets/population_trend.xlsx"
+    with pd.ExcelFile(excel_file_path) as xls:
+        df_trend = pd.read_excel(xls, sheet_name='df_trend', index_col=0)
+    return df_trend
 
 
 

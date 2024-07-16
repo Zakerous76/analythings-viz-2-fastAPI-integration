@@ -315,6 +315,58 @@ def population_origin_city():
     with pd.ExcelWriter(output_file_path) as writer:
         df_origin_city.to_excel(writer, sheet_name='df_origin_city')
 
+from prep_data import population_df
+import openpyxl
+def population_trend():
+    input_file_path = "./datasets/nüfus artisi.XLSX"
+    output_file_path = "./datasets/population_trend.xlsx"
+
+    df_trend = pd.read_excel(input_file_path)
+    df_trend.rename(columns={"İl ve ilçe\nProvince and district": "il ve ilçe", "Nüfus(1)\nPopulation(1)":"toplam", df_trend.columns[2]: "artis"}, inplace=True)
+    df_trend.drop("il ve ilçe", axis=1, inplace=True)
+
+    wb = openpyxl.load_workbook(input_file_path)
+    ws = wb.active
+    province = None
+    # First row to keep the first element
+    data = [["toplam", "toplam"]]
+    # Iterate over each row in the worksheet
+    for row in ws.iter_rows(values_only=False):
+        cell = row[0]
+        # Check if the font is bold to identify a province
+        if cell.font.bold:
+            province = cell.value
+        if province:
+            data.append([province, cell.value])
+    # Create a DataFrame from the data
+    df = pd.DataFrame(data, columns=['il', 'ilçe'])
+    df_trend = pd.concat([df, df_trend], axis=1)
+    for index, row in df_trend.iterrows():
+        df_trend.iat[index, 0] = replace_turkish_chars(row["il"])
+        df_trend.iat[index, 1] = replace_turkish_chars(row["ilçe"])
+    
+    df_p = population_df()
+    df_lookup = df_p.groupby(["il kayit no", "ilçe kayit no", "il adi cleaned", "ilçe adi cleaned"])[["erkek", "kadin"]].sum().reset_index().drop(["erkek", "kadin"], axis=1)
+    # Make sure the column names match for merging
+    df_lookup = df_lookup.rename(columns={'il adi cleaned': 'il', 'ilçe adi cleaned': 'ilçe'})
+    # Merge the DataFrames
+    merged_df = pd.merge(df_trend, df_lookup, how='left', left_on=['il', 'ilçe'], right_on=['il', 'ilçe'])
+    # Fill missing IDs with -2
+    merged_df['il kayit no'] = merged_df['il kayit no'].fillna(-1).astype(int)
+    merged_df['ilçe kayit no'] = merged_df['ilçe kayit no'].fillna(-2).astype(int)
+    # Select and reorder the columns as needed
+    result_df = merged_df[['il kayit no', 'ilçe kayit no', 'il', 'ilçe', 'toplam', 'artis']]
+    first_row = result_df.iloc[[0]]
+    # Exclude the first row
+    remaining_df = result_df.iloc[1:]
+    # Drop rows where 'il' and 'ilçe' are the same in the remaining DataFrame
+    filtered_df = remaining_df[remaining_df['il'] != remaining_df['ilçe']]
+    # Concatenate the first row back to the filtered DataFrame
+    df_trend = pd.concat([first_row, filtered_df], ignore_index=True)
+    df_trend.iat[0,0] = 0
+    df_trend.iat[0,1] = 0
+    with pd.ExcelWriter(output_file_path) as writer:
+        df_trend.to_excel(writer, sheet_name='df_trend')
 
 if __name__ == "__main__":
     sales_cities()
