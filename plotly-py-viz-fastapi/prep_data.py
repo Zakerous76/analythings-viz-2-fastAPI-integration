@@ -173,5 +173,9 @@ def population_trend_df():
         df_trend = pd.read_excel(xls, sheet_name='df_trend', index_col=0)
     return df_trend
 
-
+def secim_df():
+    excel_file_path = "./datasets/secim.xlsx"
+    with pd.ExcelFile(excel_file_path) as xls:
+        df_secim = pd.read_excel(xls, sheet_name="df_secim", index_col=0)
+    return df_secim
 

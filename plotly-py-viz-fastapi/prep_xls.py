@@ -368,6 +368,71 @@ def population_trend():
     with pd.ExcelWriter(output_file_path) as writer:
         df_trend.to_excel(writer, sheet_name='df_trend')
 
+import os
+def secim():
+    # Path to the folder containing your Excel files
+    folder_path = "./datasets/secim/"
+
+    output_file_path = "./datasets/secim.xlsx"
+    # List to store all dataframes
+    dfs_list = []
+
+    # Iterate over each file in the folder
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".xls"):
+            file_path = os.path.join(folder_path, filename)
+            
+            # Read the Excel file
+            dfs = pd.read_html(file_path)
+            
+            # Assume the first table in the HTML is the one you want
+            df = dfs[0]
+            
+            # Clean and transform the dataframe as you did before
+            df.drop(["Belde Adı"], axis=1, inplace=True)
+            df.dropna(inplace=True)
+            df = df[df["İlçe Adı"] != "Oy Oranı"].reset_index()
+            df.drop("index", axis=1, inplace=True)
+
+            columns_to_transform = df.columns[2:5].to_list()
+            df[columns_to_transform] = df[columns_to_transform].apply(lambda x: (x * 1000).astype(int))
+
+            object_columns_to_transform = df.columns[5:].to_list()
+            df[object_columns_to_transform] = df[object_columns_to_transform].apply(lambda x: x.str.replace('.', '').astype(int))
+            
+            numeric_columns = df.select_dtypes(include='number').columns.tolist()
+            # Group by "İlçe Id", keeping the first instance of "İlçe Adı" and summing up the numeric columns
+            df = df.groupby("İlçe Id", as_index=False).agg({**{'İlçe Adı': 'first'}, **{col: 'sum' for col in numeric_columns}})
+            df.drop("İlçe Id", axis=1, inplace=True)
+            # Add a new column "İl Adı" with the province name
+            province_name = filename.split('.')[0]  # Assuming filename is like "BAYBURT.xls"
+            if province_name == "AFYON":
+                province_name = "AFYONKARAHİSAR"
+            df.insert(0, 'İl Adı', province_name)
+            
+            # Fill NaN values with 0
+            
+            # Append the modified dataframe to the list
+            dfs_list.append(df)
+
+    # Concatenate all dataframes into a single dataframe
+    combined_df = pd.concat(dfs_list, ignore_index=True)
+    combined_df.fillna(0, inplace=True)
+    combined_df['İlçe Adı'] = combined_df['İlçe Adı'].apply(lambda x: ''.join(x.split()[-1]))
+    combined_df.insert(1, "il adi cleaned", combined_df["İl Adı"]) 
+    combined_df.insert(3, "ilçe adi cleaned", combined_df["İlçe Adı"]) 
+
+    for index, row in combined_df.iterrows():
+        combined_df.iat[index, 1] = replace_turkish_chars(row["il adi cleaned"])
+        combined_df.iat[index, 3] = replace_turkish_chars(row["ilçe adi cleaned"])
+
+    df_p = population_df()
+    df_lookup = df_p.groupby(["il kayit no", "ilçe kayit no", "il adi cleaned", "ilçe adi cleaned"])[["erkek", "kadin"]].sum().reset_index().drop(["erkek", "kadin"], axis=1)
+    # Merge the DataFrames
+    merged_df = pd.merge(combined_df, df_lookup, how='left', left_on=['il adi cleaned', 'ilçe adi cleaned'], right_on=['il adi cleaned', 'ilçe adi cleaned'])
+    with pd.ExcelWriter(output_file_path) as writer:
+        merged_df.to_excel(writer, sheet_name="df_secim")
+
 if __name__ == "__main__":
     sales_cities()
     sales_cities_foreigners()
