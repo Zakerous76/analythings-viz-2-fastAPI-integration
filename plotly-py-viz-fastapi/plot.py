@@ -1176,3 +1176,4 @@ def population_marital_plot(
     fig.update_layout(design)
 
     return fig
+
