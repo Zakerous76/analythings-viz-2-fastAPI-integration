@@ -150,6 +150,7 @@ def population_df():
     excel_file_path = "./datasets/population_data.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_p = pd.read_excel(xls, sheet_name='df_p', index_col=0)
+    
     return df_p
 
 def population_marital_df():
