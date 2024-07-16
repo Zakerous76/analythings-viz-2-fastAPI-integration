@@ -7,8 +7,8 @@ import plotly.graph_objs as go
 from prep_data import *
 from plot import *
 app = FastAPI()
-df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_by_cities_df() 
-df_f_total_aggregated, df_f_cities_aggregated = sales_by_cities_foreigners_df()
+df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_cities_df() 
+df_f_total_aggregated, df_f_cities_aggregated = sales_cities_foreigners_df()
 df_p = population_df()
 
 

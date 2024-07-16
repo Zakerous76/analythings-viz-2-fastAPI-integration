@@ -89,7 +89,7 @@ city_codes = {
 city_codes = {key.lower(): value for key, value in city_codes.items()}
 
 
-def sales_by_cities_df(start_year=2019, end_year=2024):
+def sales_cities_df(start_year=2019, end_year=2024):
     """
         This function returns the number of real estates sold according in each city (İl)
 
@@ -118,7 +118,7 @@ def sales_by_cities_df(start_year=2019, end_year=2024):
 
     return df_totals_total, df_totals_cities, df_granular, df_granular_cities
 
-def sales_by_cities_foreigners_df(start_year=2019, end_year=2024):
+def sales_cities_foreigners_df(start_year=2019, end_year=2024):
     """
         This function returns the number of real estates sold to foreigners in each city (İl)
 

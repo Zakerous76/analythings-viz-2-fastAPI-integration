@@ -372,3 +372,6 @@ if __name__ == "__main__":
     sales_cities()
     sales_cities_foreigners()
     population()
+    population_marital()
+    population_origin_city()
+    population_trend()
