@@ -368,7 +368,6 @@ def total_sales_yearly_plot(df_totals_cities, city_code=0, width=None, height=80
     return fig
 
 
-# city => cities
 def total_sales_monthly_plot(df_granular_cities, city_code=0, width=None, height=800):
     if city_code == 0:
         fig = go.Figure(
