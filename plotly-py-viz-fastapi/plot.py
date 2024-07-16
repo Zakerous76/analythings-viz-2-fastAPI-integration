@@ -1057,3 +1057,122 @@ def price_age_plot(
     fig_age.update_layout(design)
 
     return fig_price, fig_age
+
+
+def population_marital_plot(
+    df_married, df_never_married, df_divorced, df_widowed, city_code, height=600, width=None
+):
+    fig = make_subplots(
+        rows=1,
+        cols=4,
+        specs=[[{"type": "pie"}, {"type": "pie"}, {"type": "pie"}, {"type": "pie"}]],
+        subplot_titles=(
+            "Evli",
+            "Hiç Evlenmedi",
+            "Boşandı",
+            "Eşi Vefat Etti",
+        ),
+    )
+
+    # Define the data for each pie chart
+    values1 = [df_married.iloc[city_code, 1], df_married.iloc[city_code, 2]]
+    values2 = [df_never_married.iloc[city_code, 1], df_never_married.iloc[city_code, 2]]
+    values3 = [df_divorced.iloc[city_code, 1], df_divorced.iloc[city_code, 2]]
+    values4 = [df_widowed.iloc[city_code, 1], df_widowed.iloc[city_code, 2]]
+    labels = ["Erkek", "Kadın"]
+    colors = ["skyblue", "salmon"]
+
+    # Add the first pie chart
+    fig.add_trace(
+        go.Pie(
+            name="",
+            labels=labels,
+            values=values1,
+            marker=dict(colors=colors),
+            hovertemplate="<b>%{label}</b><br>%{value}",
+            pull=[0, 0],
+            textfont=dict(
+                size=16,
+                family=font_family,
+                color="black",
+                weight="bold",
+            ),
+            textinfo="label+percent",  # Show labels and percentages
+        ),
+        row=1,
+        col=1,
+    )
+
+    # Add the second pie chart
+    fig.add_trace(
+        go.Pie(
+            name="",
+            labels=labels,
+            values=values2,
+            marker=dict(colors=colors),
+            hovertemplate="<b>%{label}</b><br>%{value}",
+            pull=[0, 0],
+            textfont=dict(
+                size=16,
+                family=font_family,
+                color="black",
+                weight="bold",
+            ),
+            textinfo="label+percent",  # Show labels and percentages
+        ),
+        row=1,
+        col=2,
+    )
+
+    # Add the third pie chart
+    fig.add_trace(
+        go.Pie(
+            name="",
+            labels=labels,
+            values=values3,
+            marker=dict(colors=colors),
+            hovertemplate="<b>%{label}</b><br>%{value}",
+            pull=[0, 0],
+            textfont=dict(
+                size=16,
+                family=font_family,
+                color="black",
+                weight="bold",
+            ),
+            textinfo="label+percent",  # Show labels and percentages
+        ),
+        row=1,
+        col=3,
+    )
+    fig.add_trace(
+        go.Pie(
+            name="",
+            labels=labels,
+            values=values4,
+            marker=dict(colors=colors),
+            hovertemplate="<b>%{label}</b><br>%{value}",
+            pull=[0, 0],
+            # Adjust text size and color
+            textfont=dict(
+                size=16,
+                family=font_family,
+                color="black",
+                weight="bold",
+            ),
+            textinfo="label+percent",  # Show labels and percentages
+        ),
+        row=1,
+        col=4,
+    )
+
+    fig.update_layout(
+        title=f"Evlilik Durumuna Göre Nüfus: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}",
+        width=width,
+        height=height,
+        title_pad_b=10,
+        showlegend=False,
+    )
+
+    fig.update_layout(design)
+
+    return fig
