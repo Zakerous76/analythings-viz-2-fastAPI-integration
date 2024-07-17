@@ -468,6 +468,7 @@ import openpyxl
 
 
 def population_trend():
+    # Create a DataFrame from the data
     input_file_path = "./datasets/nüfus artisi.XLSX"
     output_file_path = "./datasets/population_trend.xlsx"
 
@@ -495,9 +496,11 @@ def population_trend():
             province = cell.value
         if province:
             data.append([province, cell.value])
-    # Create a DataFrame from the data
+
     df = pd.DataFrame(data, columns=["il", "ilçe"])
+    df["il original"], df["ilçe original"] = df["il"], df["ilçe"]
     df_trend = pd.concat([df, df_trend], axis=1)
+
     for index, row in df_trend.iterrows():
         df_trend.iat[index, 0] = replace_turkish_chars(row["il"])
         df_trend.iat[index, 1] = replace_turkish_chars(row["ilçe"])
@@ -524,7 +527,16 @@ def population_trend():
     merged_df["ilçe kayit no"] = merged_df["ilçe kayit no"].fillna(-2).astype(int)
     # Select and reorder the columns as needed
     result_df = merged_df[
-        ["il kayit no", "ilçe kayit no", "il", "ilçe", "toplam", "artis"]
+        [
+            "il kayit no",
+            "ilçe kayit no",
+            "il",
+            "ilçe",
+            "toplam",
+            "artis",
+            "il original",
+            "ilçe original",
+        ]
     ]
     first_row = result_df.iloc[[0]]
     # Exclude the first row
