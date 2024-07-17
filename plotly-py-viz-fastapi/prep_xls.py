@@ -555,11 +555,11 @@ def population_trend():
 import os
 
 
-def secim():
+def election():
     # Path to the folder containing your Excel files
     folder_path = "./datasets/secim/"
 
-    output_file_path = "./datasets/secim.xlsx"
+    output_file_path = "./datasets/election.xlsx"
     # List to store all dataframes
     dfs_list = []
 
@@ -640,7 +640,7 @@ def secim():
         right_on=["il adi cleaned", "ilçe adi cleaned"],
     )
     with pd.ExcelWriter(output_file_path) as writer:
-        merged_df.to_excel(writer, sheet_name="df_secim")
+        merged_df.to_excel(writer, sheet_name="df_election")
 
 
 if __name__ == "__main__":

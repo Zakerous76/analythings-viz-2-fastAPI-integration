@@ -1241,7 +1241,7 @@ def population_trend_plot(df_trend, city_code=1, height=800, width=None):
     fig = go.Figure(
         data=[
             go.Bar(
-                name="Population Change",
+                name="Nüfus Değişimi",
                 x=df_filtered['ilçe original'],
                 y=df_filtered['artis'],
                 text=df_filtered['artis'],
@@ -1259,7 +1259,75 @@ def population_trend_plot(df_trend, city_code=1, height=800, width=None):
         margin=dict(t=100, b=200, l=100, r=100),
         xaxis_title="İlçe",
         yaxis_title="Değişim (%)",
+        xaxis_showgrid=False,
+
     )
     fig.update_layout(design)
+
+    return fig
+
+def population_elections_plot(df_election: pd.DataFrame, city_code: int = 1, province_code=None, height=600, width=None):
+    # Only City
+    if province_code == None:
+        selected_df = df_election[(df_election["il kayit no"]==city_code)].sum()[7:-2]
+        labels = selected_df.index.to_list()
+        values = selected_df.to_list()
+        title_text=f"Seçim: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}"
+
+    # City and Province
+    else:
+        selected_df = df_election[(df_election["il kayit no"]==city_code) & (df_election["ilçe kayit no"]==province_code)]
+        labels = selected_df.columns[7:-2].to_list()
+        values = selected_df[selected_df.columns[7:-2].to_list()].iloc[0]
+        title_text=f"Seçim: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}, {selected_df.iloc[0, 2]}"
+
+
+
+    # Group smaller categories into "Other"
+    threshold = 0.005 * sum(values)
+    labels_grouped = []
+    values_grouped = []
+    other_value = 0
+
+    for label, value in zip(labels, values):
+        if value < threshold:
+            other_value += value
+        else:
+            labels_grouped.append(label)
+            values_grouped.append(value)
+
+    if other_value > 0:
+        labels_grouped.append('Diğer')
+        values_grouped.append(other_value)
+        
+    sorted_labels_values = sorted(zip(values_grouped, labels_grouped), reverse=True)
+    values_grouped_sorted, labels_grouped_sorted = zip(*sorted_labels_values)
+
+    fig = go.Figure(
+        data=[
+            go.Bar(
+                name="",
+                x=labels_grouped_sorted,
+                y=values_grouped_sorted,
+                text=values_grouped_sorted,
+                texttemplate="%{text:,}",
+                textposition='auto',
+                marker=dict(color=px.colors.qualitative.Set3),
+                hovertemplate="%{label}: %{value}",
+
+            )
+        ]
+    )
+
+    fig.update_layout(design)
+    # Update layout for the bar chart
+    fig.update_layout(
+        title_text=title_text,
+        height=800,
+        margin=dict(t=100, b=200, l=100, r=100),
+        xaxis_title="Parti",
+        yaxis_title="",
+        xaxis_showgrid=False,
+    )
 
     return fig

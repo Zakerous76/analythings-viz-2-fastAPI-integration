@@ -203,8 +203,8 @@ def population_trend_df():
     return df_trend
 
 
-def secim_df():
-    excel_file_path = "./datasets/secim.xlsx"
+def election_df():
+    excel_file_path = "./datasets/election.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
-        df_secim = pd.read_excel(xls, sheet_name="df_secim", index_col=0)
-    return df_secim
+        df_election = pd.read_excel(xls, sheet_name="df_election", index_col=0)
+    return df_election
