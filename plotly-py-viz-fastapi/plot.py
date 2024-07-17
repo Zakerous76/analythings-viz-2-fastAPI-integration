@@ -1222,13 +1222,44 @@ def population_origin_city_plot(df_origin_city, city_code=1, height=800, width=N
     # Update layout for the age figure
     fig.update_layout(
         title_text=f"İkamet Edilen İle göre Nüfus Kütüğüne Kayıtlı Olunan İl: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}",
-        title_x=0.5,
         height=height,  # Increase height to give more space
         width=width,   # Increase width to give more space
         margin=dict(t=100, b=100, l=100, r=100),  # Adjust margins
-        title_xanchor="center",
         showlegend=False,
     )
 
     fig.update_layout(design)
+    return fig
+
+
+def population_trend_plot(df_trend, city_code=1, height=800, width=None):
+    # Sample data
+    df_filtered = df_trend[df_trend["il kayit no"]==city_code]
+    colors = ['lightgreen' if x > 0 else 'tomato' for x in df_filtered['artis']]
+
+    # Create the bar chart
+    fig = go.Figure(
+        data=[
+            go.Bar(
+                name="Population Change",
+                x=df_filtered['ilçe original'],
+                y=df_filtered['artis'],
+                text=df_filtered['artis'],
+                textposition='auto',
+                marker=dict(color=colors),
+            )
+        ]
+    )
+
+    # Update layout for the bar chart
+    fig.update_layout(
+        title_text=f"Nüfus Değişimi: {city_code_map.get(city_code).capitalize()}",
+        height=height,
+        width=width,
+        margin=dict(t=100, b=200, l=100, r=100),
+        xaxis_title="İlçe",
+        yaxis_title="Değişim (%)",
+    )
+    fig.update_layout(design)
+
     return fig
