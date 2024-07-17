@@ -9,6 +9,8 @@ font_family = "Verdana"
 label_font_size = 25
 line_width = 5
 marker_size = 12
+color_sequence = px.colors.qualitative.Set3
+
 
 teal_like = "#233d4d"
 orange_like = "orange"
@@ -1177,3 +1179,56 @@ def population_marital_plot(
 
     return fig
 
+def population_origin_city_plot(df_origin_city, city_code=1, height=800, width=None):
+    labels = [city_code_map.get(i).capitalize() for i in df_origin_city.columns[1:] if i!=city_code]
+    values = df_origin_city.loc[city_code][1:]
+
+    # Group smaller categories into "Other"
+    threshold = 0.01 * sum(values)
+    labels_grouped = []
+    values_grouped = []
+    other_value = 0
+
+    for label, value in zip(labels, values):
+        if value < threshold:
+            other_value += value
+        else:
+            labels_grouped.append(label)
+            values_grouped.append(value)
+
+    if other_value > 0:
+        labels_grouped.append('Diğer')
+        values_grouped.append(other_value)
+
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                name="",
+                labels=labels_grouped,
+                values=values_grouped,
+                hovertemplate="<b>%{label}</b><br>%{value} = %{percent}",
+                textfont=dict(
+                    size=18,
+                    family=font_family,
+                    weight="bold",
+                ),
+                textinfo="label",  # Show labels and percentages
+                marker=dict(colors=color_sequence),
+                sort=True,
+            )
+        ]
+    )
+
+    # Update layout for the age figure
+    fig.update_layout(
+        title_text=f"İkamet Edilen İle göre Nüfus Kütüğüne Kayıtlı Olunan İl: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}",
+        title_x=0.5,
+        height=height,  # Increase height to give more space
+        width=width,   # Increase width to give more space
+        margin=dict(t=100, b=100, l=100, r=100),  # Adjust margins
+        title_xanchor="center",
+        showlegend=False,
+    )
+
+    fig.update_layout(design)
+    return fig
