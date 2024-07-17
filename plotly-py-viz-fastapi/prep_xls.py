@@ -535,6 +535,7 @@ def population_trend():
     df_trend = pd.concat([first_row, filtered_df], ignore_index=True)
     df_trend.iat[0, 0] = 0
     df_trend.iat[0, 1] = 0
+    df_trend["artis"] = df_trend["artis"].map(lambda x: f"{x:.2f}")
     with pd.ExcelWriter(output_file_path) as writer:
         df_trend.to_excel(writer, sheet_name="df_trend")
 
