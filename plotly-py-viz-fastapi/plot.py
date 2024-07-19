@@ -707,6 +707,7 @@ def population_mah_plot(
             labels=labels,
             values=values1,
             marker=dict(colors=colors),
+            hole=0.6,
             hovertemplate="<b>%{label}</b><br>%{value}",
             textfont=dict(
                 size=label_font_size,
@@ -1034,8 +1035,9 @@ def price_age_plot(
             go.Pie(
                 labels=labels,
                 values=values,
-                hole=0.4,
+                hole=0.6,
                 hovertemplate="Bina Yaşı: %{label}<br>Yüzdelik: %{value:.1f}%<extra></extra>",
+                marker=dict(colors=color_sequence),
                 sort=False,
                 textfont=dict(
                     size=18,
@@ -1062,37 +1064,49 @@ def price_age_plot(
 
 
 def population_marital_plot(
-    df_married, df_never_married, df_divorced, df_widowed, city_code, height=600, width=None
+    df_married,
+    df_never_married,
+    df_divorced,
+    df_widowed,
+    city_code,
+    height=600,
+    width=None,
 ):
     fig = make_subplots(
         rows=1,
-        cols=4,
-        specs=[[{"type": "pie"}, {"type": "pie"}, {"type": "pie"}, {"type": "pie"}]],
+        cols=3,
+        specs=[[{"type": "pie"}, {"type": "pie"}, {"type": "pie"}]],
         subplot_titles=(
+            "Evli-Bekar Oranı",
             "Evli",
-            "Hiç Evlenmedi",
-            "Boşandı",
-            "Eşi Vefat Etti",
+            "Bekar",
         ),
     )
 
     # Define the data for each pie chart
     values1 = [df_married.iloc[city_code, 1], df_married.iloc[city_code, 2]]
-    values2 = [df_never_married.iloc[city_code, 1], df_never_married.iloc[city_code, 2]]
-    values3 = [df_divorced.iloc[city_code, 1], df_divorced.iloc[city_code, 2]]
-    values4 = [df_widowed.iloc[city_code, 1], df_widowed.iloc[city_code, 2]]
+    values2 = [
+        df_never_married.iloc[city_code, 1]
+        + df_divorced.iloc[city_code, 1]
+        + df_widowed.iloc[city_code, 1],
+        df_never_married.iloc[city_code, 2]
+        + df_divorced.iloc[city_code, 2]
+        + df_widowed.iloc[city_code, 2],
+    ]
     labels = ["Erkek", "Kadın"]
+    labels_2 = ["Evli", "Bekar"]
     colors = ["skyblue", "salmon"]
 
     # Add the first pie chart
     fig.add_trace(
         go.Pie(
             name="",
-            labels=labels,
-            values=values1,
+            labels=labels_2,
+            values=[sum(values1), sum(values2)],
             marker=dict(colors=colors),
             hovertemplate="<b>%{label}</b><br>%{value}",
             pull=[0, 0],
+            hole=0.75,
             textfont=dict(
                 size=16,
                 family=font_family,
@@ -1110,9 +1124,10 @@ def population_marital_plot(
         go.Pie(
             name="",
             labels=labels,
-            values=values2,
+            values=values1,
             marker=dict(colors=colors),
             hovertemplate="<b>%{label}</b><br>%{value}",
+            hole=0.75,
             pull=[0, 0],
             textfont=dict(
                 size=16,
@@ -1131,9 +1146,10 @@ def population_marital_plot(
         go.Pie(
             name="",
             labels=labels,
-            values=values3,
+            values=values2,
             marker=dict(colors=colors),
             hovertemplate="<b>%{label}</b><br>%{value}",
+            hole=0.75,
             pull=[0, 0],
             textfont=dict(
                 size=16,
@@ -1146,41 +1162,62 @@ def population_marital_plot(
         row=1,
         col=3,
     )
-    fig.add_trace(
-        go.Pie(
-            name="",
-            labels=labels,
-            values=values4,
-            marker=dict(colors=colors),
-            hovertemplate="<b>%{label}</b><br>%{value}",
-            pull=[0, 0],
-            # Adjust text size and color
-            textfont=dict(
-                size=16,
-                family=font_family,
-                color="black",
-                weight="bold",
-            ),
-            textinfo="label+percent",  # Show labels and percentages
-        ),
-        row=1,
-        col=4,
-    )
 
     fig.update_layout(
-        title=f"Evlilik Durumuna Göre Nüfus: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}",
-        width=width,
+        title=f"Evlilik Durumuna Göre Nüfus: {city_code_map.get(city_code).capitalize()}",
         height=height,
+        width=width,
         title_pad_b=10,
         showlegend=False,
     )
 
+    annotations_font = dict(size=25, family=font_family, color="black", weight="bold")
+
+    fig.update_layout(
+        title=f"Evlilik Durumuna Göre Nüfus: {city_code_map.get(city_code).capitalize()}",
+        title_pad_b=20,
+        showlegend=False,
+        annotations=[
+            dict(
+                x=0.15,  # Adjust this value to position the title correctly
+                y=1,  # Adjust this value to position the title correctly
+                xref="paper",
+                yref="paper",
+                showarrow=False,
+                align="right",
+                font=annotations_font,
+            ),
+            dict(
+                x=0.5,  # Adjust this value to position the title correctly
+                y=1,  # Adjust this value to position the title correctly
+                xref="paper",
+                yref="paper",
+                showarrow=False,
+                align="right",
+                font=annotations_font,
+            ),
+            dict(
+                x=0.85,  # Adjust this value to position the title correctly
+                y=1,  # Adjust this value to position the title correctly
+                xref="paper",
+                yref="paper",
+                showarrow=False,
+                font=annotations_font,
+                align="right",
+            ),
+        ],
+    )
     fig.update_layout(design)
 
     return fig
 
+
 def population_origin_city_plot(df_origin_city, city_code=1, height=800, width=None):
-    labels = [city_code_map.get(i).capitalize() for i in df_origin_city.columns[1:] if i!=city_code]
+    labels = [
+        city_code_map.get(i).capitalize()
+        for i in df_origin_city.columns[1:]
+        if i != city_code
+    ]
     values = df_origin_city.loc[city_code][1:]
 
     # Group smaller categories into "Other"
@@ -1197,7 +1234,7 @@ def population_origin_city_plot(df_origin_city, city_code=1, height=800, width=N
             values_grouped.append(value)
 
     if other_value > 0:
-        labels_grouped.append('Diğer')
+        labels_grouped.append("Diğer")
         values_grouped.append(other_value)
 
     fig = go.Figure(
@@ -1221,9 +1258,9 @@ def population_origin_city_plot(df_origin_city, city_code=1, height=800, width=N
 
     # Update layout for the age figure
     fig.update_layout(
-        title_text=f"İkamet Edilen İle göre Nüfus Kütüğüne Kayıtlı Olunan İl: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}",
+        title_text=f"İkamet Edilen İle göre Nüfus Kütüğüne Kayıtlı Olunan İl: {city_code_map.get(city_code).capitalize()}",
         height=height,  # Increase height to give more space
-        width=width,   # Increase width to give more space
+        width=width,  # Increase width to give more space
         margin=dict(t=100, b=100, l=100, r=100),  # Adjust margins
         showlegend=False,
     )
@@ -1234,18 +1271,18 @@ def population_origin_city_plot(df_origin_city, city_code=1, height=800, width=N
 
 def population_trend_plot(df_trend, city_code=1, height=800, width=None):
     # Sample data
-    df_filtered = df_trend[df_trend["il kayit no"]==city_code]
-    colors = ['lightgreen' if x > 0 else 'tomato' for x in df_filtered['artis']]
+    df_filtered = df_trend[df_trend["il kayit no"] == city_code]
+    colors = ["lightgreen" if x > 0 else "tomato" for x in df_filtered["artis"]]
 
     # Create the bar chart
     fig = go.Figure(
         data=[
             go.Bar(
                 name="Nüfus Değişimi",
-                x=df_filtered['ilçe original'],
-                y=df_filtered['artis'],
-                text=df_filtered['artis'],
-                textposition='auto',
+                x=df_filtered["ilçe original"],
+                y=df_filtered["artis"],
+                text=df_filtered["artis"],
+                textposition="auto",
                 marker=dict(color=colors),
             )
         ]
@@ -1260,28 +1297,35 @@ def population_trend_plot(df_trend, city_code=1, height=800, width=None):
         xaxis_title="İlçe",
         yaxis_title="Değişim (%)",
         xaxis_showgrid=False,
-
     )
     fig.update_layout(design)
 
     return fig
 
-def population_elections_plot(df_election: pd.DataFrame, city_code: int = 1, province_code=None, height=600, width=None):
+
+def population_election_plot(
+    df_election: pd.DataFrame,
+    city_code: int = 1,
+    district_code=None,
+    height=600,
+    width=None,
+):
     # Only City
-    if province_code == None:
-        selected_df = df_election[(df_election["il kayit no"]==city_code)].sum()[7:-2]
+    if district_code == None:
+        selected_df = df_election[(df_election["il kayit no"] == city_code)].sum()[7:-2]
         labels = selected_df.index.to_list()
         values = selected_df.to_list()
-        title_text=f"Seçim: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}"
+        title_text = f"Seçim: {city_code_map.get(city_code).capitalize()}"
 
     # City and Province
     else:
-        selected_df = df_election[(df_election["il kayit no"]==city_code) & (df_election["ilçe kayit no"]==province_code)]
+        selected_df = df_election[
+            (df_election["il kayit no"] == city_code)
+            & (df_election["ilçe kayit no"] == district_code)
+        ]
         labels = selected_df.columns[7:-2].to_list()
         values = selected_df[selected_df.columns[7:-2].to_list()].iloc[0]
-        title_text=f"Seçim: {city_code_map.get(city_code, "Şehir Bulunamadı").capitalize()}, {selected_df.iloc[0, 2]}"
-
-
+        title_text = f"Seçim: {city_code_map.get(city_code).capitalize()}, {selected_df.iloc[0, 2]}"
 
     # Group smaller categories into "Other"
     threshold = 0.005 * sum(values)
@@ -1297,9 +1341,9 @@ def population_elections_plot(df_election: pd.DataFrame, city_code: int = 1, pro
             values_grouped.append(value)
 
     if other_value > 0:
-        labels_grouped.append('Diğer')
+        labels_grouped.append("Diğer")
         values_grouped.append(other_value)
-        
+
     sorted_labels_values = sorted(zip(values_grouped, labels_grouped), reverse=True)
     values_grouped_sorted, labels_grouped_sorted = zip(*sorted_labels_values)
 
@@ -1311,10 +1355,9 @@ def population_elections_plot(df_election: pd.DataFrame, city_code: int = 1, pro
                 y=values_grouped_sorted,
                 text=values_grouped_sorted,
                 texttemplate="%{text:,}",
-                textposition='auto',
+                textposition="auto",
                 marker=dict(color=px.colors.qualitative.Set3),
                 hovertemplate="%{label}: %{value}",
-
             )
         ]
     )

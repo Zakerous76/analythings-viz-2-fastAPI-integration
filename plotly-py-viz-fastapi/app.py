@@ -12,6 +12,9 @@ df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_citie
 df_f_total_aggregated, df_f_cities_aggregated = sales_cities_foreigners_df()
 df_p = population_df()
 dfs_p_marital = population_marital_df()
+df_trend = population_trend_df()
+df_election = election_df()
+df_origin_city = population_origin_city_df()
 
 
 class PlotRequest(BaseModel):
@@ -201,9 +204,48 @@ async def get_population_mah_plot(
 
 @app.get("/population_marital_status_plot")
 async def get_population_marital_plot(
-    city_code: int = Query(0, title="City Code", description="Code of the city"),
+    city_code: int = Query(1, title="City Code", description="Code of the city"),
 ):
     fig = population_marital_plot(*dfs_p_marital, city_code)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"{graph_html}")
+
+
+@app.get("/population_origin_city_plot")
+async def get_population_origin_city_plot(
+    city_code: int = Query(1, title="City Code", description="Code of the city"),
+    height: int = Query(
+        800, title="Plot Height in Px", description="Height of the plot"
+    ),
+):
+    fig = population_origin_city_plot(df_origin_city, city_code, height=height)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"{graph_html}")
+
+
+@app.get("/population_trend_plot")
+async def get_population_trend_plot(
+    city_code: int = Query(1, title="City Code", description="Code of the city"),
+    height: int = Query(
+        800, title="Plot Height in Px", description="Height of the plot"
+    ),
+):
+    fig = population_trend_plot(df_trend, city_code, height=height)
+    graph_html = pio.to_html(fig, full_html=False)
+    return HTMLResponse(content=f"{graph_html}")
+
+
+@app.get("/population_election_plot")
+async def get_population_election_plot(
+    city_code: int = Query(1, title="City Code", description="Code of the city"),
+    district_code: int = Query(None, title="City Code", description="Code of the city"),
+    height: int = Query(
+        800, title="Plot Height in Px", description="Height of the plot"
+    ),
+):
+    fig = population_election_plot(
+        df_election, city_code, district_code=district_code, height=height
+    )
     graph_html = pio.to_html(fig, full_html=False)
     return HTMLResponse(content=f"{graph_html}")
 
@@ -241,6 +283,9 @@ async def display_all():
         {pio.to_html(price_plot_demo()[0], full_html=False)}<br>
         {pio.to_html(price_plot_demo()[1], full_html=False)}<br>
         {pio.to_html(population_marital_plot(*dfs_p_marital, city_code=1), full_html=False)}<br>
+        {pio.to_html(population_origin_city_plot(df_origin_city, city_code=1), full_html=False)}<br>
+        {pio.to_html(population_election_plot(df_election, city_code=1), full_html=False)}<br>
+        {pio.to_html(population_trend_plot(df_trend, city_code=1), full_html=False)}<br>
 
 
         """
