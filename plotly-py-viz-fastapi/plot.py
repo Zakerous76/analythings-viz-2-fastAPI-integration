@@ -629,121 +629,6 @@ def total_sales_monthly_foreigners_plot(
         raise
 
 
-def population_mah_plot(
-    df_p, city_code=0, town_code=0, quarter_code=0, width=None, height=800
-):
-    # Create the figure with subplots
-    labels = ["Erkek", "Kadın"]
-    colors = ["skyblue", "salmon"]
-    title = ""
-    fig = go.Figure()
-
-    if city_code == 0 and town_code == 0 and quarter_code == 0:
-        title = "Bütün Ülke"
-        values1 = df_p[["erkek", "kadin"]].sum().to_list()
-
-    elif city_code != 0 and (town_code == 0 and quarter_code == 0):
-        city_name = (
-            df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
-        )
-        title = f"{city_name}"
-
-    elif city_code != 0 and (town_code != 0 and quarter_code == 0):
-        city_name = (
-            df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
-        )
-        town_name = (
-            df_p[df_p["ilçe kayit no"] == town_code]["ilçe adi"].iloc[0].capitalize()
-        )
-        title = f"{city_name}, {town_name}"
-        values1 = df_p[
-            (df_p["il kayit no"] == city_code) & (df_p["ilçe kayit no"] == town_code)
-        ]
-        values1 = values1[["erkek", "kadin"]].sum().to_list()
-
-    elif city_code != 0 and (town_code != 0 and quarter_code != 0):
-        city_name = (
-            df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
-        )
-        town_name = (
-            df_p[df_p["ilçe kayit no"] == town_code]["ilçe adi"].iloc[0].capitalize()
-        )
-        quarter_name = (
-            df_p[df_p["mahalle kayit no"] == quarter_code]["mahalle adi"]
-            .iloc[0]
-            .capitalize()
-        )
-        title = f"{city_name}, {town_name}, {quarter_name} Mh."
-        values1 = df_p[
-            (df_p["il kayit no"] == city_code)
-            & (df_p["ilçe kayit no"] == town_code)
-            & (df_p["mahalle kayit no"] == quarter_code)
-        ]
-        values1 = values1[["erkek", "kadin"]].sum().to_list()
-
-    else:
-        fig.add_annotation(
-            text="Please enter either: Only city name, City name and Town name, or all three",
-            xref="paper",
-            yref="paper",
-            x=0.5,
-            y=0.5,
-            showarrow=False,
-            font=dict(family=font_family, size=20, color="black"),
-        )
-
-        # Update layout to remove axes
-        fig.update_layout(
-            xaxis=dict(visible=False),
-            yaxis=dict(visible=False),
-            plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=0, r=0, t=0, b=0),
-        )
-        return fig
-
-    fig.add_trace(
-        go.Pie(
-            name="",
-            labels=labels,
-            values=values1,
-            marker=dict(colors=colors),
-            hole=0.6,
-            hovertemplate="<b>%{label}</b><br>%{value}",
-            textfont=dict(
-                size=label_font_size,
-                family=font_family,
-                weight="bold",
-            ),  # Adjust text size and color
-            textinfo="label+percent",  # Show labels and percentages
-        )
-    )
-
-    # Update layout
-    fig.update_layout(
-        title=f"Cinsiyet Dağılımları: {title}",
-        width=width,
-        height=height,
-        showlegend=False,
-    )
-    fig.update_layout(design)
-
-    for annotation in fig["layout"]["annotations"]:
-        annotation["y"] = 0.95  # Adjust this value for more/less padding
-
-    # Add the text annotation below the plots
-    fig.add_annotation(
-        text=f"Toplam Nüfus: <b>{sum(values1):,}</b>",
-        xref="paper",
-        yref="paper",
-        x=0.5,
-        y=-0.1,
-        showarrow=False,
-        font=dict(size=18, family=font_family, color="black"),
-        align="center",
-    )
-    return fig
-
-
 def population_plot(df_p, city_code=0, width=None, height=500):
     # Create the figure with subplots
     fig = make_subplots(
@@ -1061,6 +946,121 @@ def price_age_plot(
     fig_age.update_layout(design)
 
     return fig_price, fig_age
+
+
+def population_mah_plot(
+    df_p, city_code=0, town_code=0, quarter_code=0, width=None, height=800
+):
+    # Create the figure with subplots
+    labels = ["Erkek", "Kadın"]
+    colors = ["skyblue", "salmon"]
+    title = ""
+    fig = go.Figure()
+
+    if city_code == 0 and town_code == 0 and quarter_code == 0:
+        title = "Bütün Ülke"
+        values1 = df_p[["erkek", "kadin"]].sum().to_list()
+
+    elif city_code != 0 and (town_code == 0 and quarter_code == 0):
+        city_name = (
+            df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
+        )
+        title = f"{city_name}"
+
+    elif city_code != 0 and (town_code != 0 and quarter_code == 0):
+        city_name = (
+            df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
+        )
+        town_name = (
+            df_p[df_p["ilçe kayit no"] == town_code]["ilçe adi"].iloc[0].capitalize()
+        )
+        title = f"{city_name}, {town_name}"
+        values1 = df_p[
+            (df_p["il kayit no"] == city_code) & (df_p["ilçe kayit no"] == town_code)
+        ]
+        values1 = values1[["erkek", "kadin"]].sum().to_list()
+
+    elif city_code != 0 and (town_code != 0 and quarter_code != 0):
+        city_name = (
+            df_p[df_p["il kayit no"] == city_code]["il adi"].iloc[0].capitalize()
+        )
+        town_name = (
+            df_p[df_p["ilçe kayit no"] == town_code]["ilçe adi"].iloc[0].capitalize()
+        )
+        quarter_name = (
+            df_p[df_p["mahalle kayit no"] == quarter_code]["mahalle adi"]
+            .iloc[0]
+            .capitalize()
+        )
+        title = f"{city_name}, {town_name}, {quarter_name} Mh."
+        values1 = df_p[
+            (df_p["il kayit no"] == city_code)
+            & (df_p["ilçe kayit no"] == town_code)
+            & (df_p["mahalle kayit no"] == quarter_code)
+        ]
+        values1 = values1[["erkek", "kadin"]].sum().to_list()
+
+    else:
+        fig.add_annotation(
+            text="Please enter either: Only city name, City name and Town name, or all three",
+            xref="paper",
+            yref="paper",
+            x=0.5,
+            y=0.5,
+            showarrow=False,
+            font=dict(family=font_family, size=20, color="black"),
+        )
+
+        # Update layout to remove axes
+        fig.update_layout(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            plot_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=0, r=0, t=0, b=0),
+        )
+        return fig
+
+    fig.add_trace(
+        go.Pie(
+            name="",
+            labels=labels,
+            values=values1,
+            marker=dict(colors=colors),
+            hole=0.6,
+            hovertemplate="<b>%{label}</b><br>%{value}",
+            textfont=dict(
+                size=label_font_size,
+                family=font_family,
+                weight="bold",
+            ),  # Adjust text size and color
+            textinfo="label+percent",  # Show labels and percentages
+        )
+    )
+
+    # Update layout
+    fig.update_layout(
+        title=f"Cinsiyet Dağılımları: {title}",
+        width=width,
+        height=height,
+        showlegend=False,
+    )
+    fig.update_layout(design)
+
+    for annotation in fig["layout"]["annotations"]:
+        annotation["y"] = 0.95  # Adjust this value for more/less padding
+
+    # Add the text annotation below the plots
+    fig.add_annotation(
+        text=f"Toplam Nüfus: <b>{sum(values1):,}</b>",
+        xref="paper",
+        yref="paper",
+        x=0.5,
+        y=-0.1,
+        showarrow=False,
+        font=dict(size=18, family=font_family, color="black"),
+        align="center",
+    )
+    return fig
 
 
 def population_marital_plot(
