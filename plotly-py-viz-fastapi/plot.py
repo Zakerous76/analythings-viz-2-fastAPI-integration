@@ -1325,7 +1325,7 @@ def population_election_plot(
         ]
         labels = selected_df.columns[7:-2].to_list()
         values = selected_df[selected_df.columns[7:-2].to_list()].iloc[0]
-        title_text = f"Seçim: {city_code_map.get(city_code).capitalize()}, {selected_df.iloc[0, 2]}"
+        title_text = f"31 Mart 2024 Mahalli İdareler Genel Seçimi: {city_code_map.get(city_code).capitalize()}, {selected_df.iloc[0, 2]}"
 
     # Group smaller categories into "Other"
     threshold = 0.005 * sum(values)
