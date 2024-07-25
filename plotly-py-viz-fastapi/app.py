@@ -1,9 +1,8 @@
-from fastapi import FastAPI, Path, HTTPException, Request, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
 import uvicorn
 from pydantic import BaseModel
 import plotly.io as pio
-import plotly.graph_objs as go
 from prep_data import *
 from plot import *
 
@@ -15,6 +14,8 @@ dfs_p_marital = population_marital_df()
 df_trend = population_trend_df()
 df_election = election_df()
 df_origin_city = population_origin_city_df()
+
+plots = {}
 
 
 class PlotRequest(BaseModel):
@@ -54,6 +55,95 @@ def create_html_form_pop(label, action, input_names):
     </form>
     """
     return form_html
+
+
+@app.on_event("startup")
+async def startup():
+    global plots
+    plots["total_sales"] = pio.to_html(
+        total_sales_plot(df_granular),
+        full_html=False,
+        include_plotlyjs=False,
+        include_mathjax=False,
+    )
+    plots["total_sales_animate"] = pio.to_html(
+        total_sales_animate(df_granular),
+        full_html=False,
+        include_plotlyjs=False,
+        include_mathjax=False,
+    )
+    plots["total_sales_animate"] = pio.to_html(
+        total_sales_animate(df_granular),
+        full_html=False,
+        include_plotlyjs=False,
+        include_mathjax=False,
+    )
+
+    plots["total_sales_foreigners_animate"] = pio.to_html(
+        total_sales_foreigners_animate(df_f_total_aggregated),
+        full_html=False,
+        include_plotlyjs=False,
+        include_mathjax=False,
+    )
+
+    # total_sales_montly (per city)
+    # total_sales_montly_foreigners (per city)
+    # population_origin_city_plot (per city)
+    # population_marital_plot (per city)
+    # population_trend_plot (per city)
+
+    plots["total_sales_monthly"] = []
+    for i in range(0, 82):
+        plots["total_sales_monthly"].append(
+            pio.to_html(
+                total_sales_monthly_plot(df_granular_cities, city_code=i),
+                full_html=False,
+                include_plotlyjs=False,
+                include_mathjax=False,
+            )
+        )
+    plots["total_sales_monthly_foreigners"] = []
+    for i in range(0, 82):
+        plots["total_sales_monthly_foreigners"].append(
+            pio.to_html(
+                total_sales_monthly_foreigners_plot(
+                    df_f_cities_aggregated, city_code=i
+                ),
+                full_html=False,
+                include_plotlyjs=False,
+                include_mathjax=False,
+            )
+        )
+    plots["population_origin_city_plot"] = []
+    for i in range(0, 82):
+        plots["population_origin_city_plot"].append(
+            pio.to_html(
+                population_origin_city_plot(df_origin_city, city_code=i),
+                full_html=False,
+                include_plotlyjs=False,
+                include_mathjax=False,
+            )
+        )
+    plots["population_marital_plot"] = []
+    for i in range(0, 82):
+        plots["population_marital_plot"].append(
+            pio.to_html(
+                population_marital_plot(*dfs_p_marital, city_code=i),
+                full_html=False,
+                include_plotlyjs=False,
+                include_mathjax=False,
+            )
+        )
+    plots["population_trend_plot"] = []
+    for i in range(0, 82):
+        plots["population_trend_plot"].append(
+            pio.to_html(
+                population_trend_plot(df_trend, city_code=i),
+                full_html=False,
+                include_plotlyjs=False,
+                include_mathjax=False,
+            )
+        )
 
 
 # Create an endpoint
@@ -110,28 +200,28 @@ async def get_home():
 @app.get("/total_sales")
 async def get_total_sales(
     # interval: str = Query(None, title="Interval", description="Write the interval (ex: 2015 2021)"),
-    height: int = Query(800, description="height of the plot"),
+    # height: int = Query(800, description="height of the plot"),
 ):
-    # start_year, end_year = int(interval.split()[0]), int(interval.split()[1])
-    fig = total_sales_plot(df_granular, height=height)
-    graph_html = pio.to_html(
-        fig,
-        full_html=False,
-        include_plotlyjs=False,
-        include_mathjax=False,
-        include_plotlyjs=False,
-        include_mathjax=False,
-    )  # will return a single <div> element
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        return HTMLResponse(content=f"{plots['total_sales']}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the total_sales plot.",
+        )
 
 
 @app.get("/total_sales_animate")
 async def get_total_sales_animate():
-    fig = total_sales_animate(df_granular)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        return HTMLResponse(content=f"{plots['total_sales_animate']}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the total_sales_animate plot.",
+        )
 
 
 @app.get("/total_sales_yearly/")
@@ -140,11 +230,18 @@ async def get_total_sales_yearly(
         0, title="City Code", description="Enter the city code (ex: Ankara is 6)"
     )
 ):
-    fig = total_sales_yearly_plot(df_totals_cities, city_code)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        fig = total_sales_yearly_plot(df_totals_cities, city_code)
+        graph_html = pio.to_html(
+            fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
+        return HTMLResponse(content=f"{graph_html}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the total_sales_yearly plot.",
+        )
 
 
 @app.get("/total_sales_monthly/")
@@ -153,39 +250,26 @@ async def get_total_sales_monthly(
         0, title="City Code", description="Enter the city code (ex: Ankara is 6)"
     )
 ):
-    fig = total_sales_monthly_plot(df_granular_cities, city_code)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
-
-
-@app.post("/create-plot/", response_class=HTMLResponse)
-async def create_plot(plot_request: PlotRequest):
-    plot_type = plot_request.plot_type
-    data = plot_request.data
-
-    # Create a plot based on the plot_type
-    if plot_type == "bar":
-        fig = go.Figure(data=[go.Bar(x=data["x"], y=data["y"])])
-    elif plot_type == "line":
-        fig = go.Figure(data=[go.Scatter(x=data["x"], y=data["y"], mode="lines")])
-    else:
-        raise HTTPException(status_code=400, detail="Invalid plot type")
-
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        return HTMLResponse(content=f"{plots['total_sales_monthly'][city_code]}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the total_sales_monthly plot.",
+        )
 
 
 @app.get("/total_sales_to_foreigners_animate")
 async def get_total_sales_to_foreigners_animate():
-    fig = total_sales_foreigners_animate(df_f_total_aggregated)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        return HTMLResponse(content=f"{plots['total_sales_foreigners_animate']}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the total_sales_to_foreigners_animate plot.",
+        )
 
 
 @app.get("/total_sales_monthly_foreigners/")
@@ -195,15 +279,14 @@ async def get_total_sales_monthly_foreigners(
     )
 ):
     try:
-        fig = total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code)
-        graph_html = pio.to_html(
-            fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+        return HTMLResponse(
+            content=f"{plots['total_sales_monthly_foreigners'][city_code]}"
         )
-        return HTMLResponse(content=f"{graph_html}")
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
-            status_code=500, detail="An error occurred while generating the plot."
+            status_code=500,
+            detail="An error occurred while generating the total_sales_monthly_foreigners plot.",
         )
 
 
@@ -216,22 +299,32 @@ async def get_population_mah_plot(
         0, title="Quarter code", description="Code of the quarter"
     ),
 ):
-    fig = population_mah_plot(df_p, city_code, town_code, quarter_code)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        fig = population_mah_plot(df_p, city_code, town_code, quarter_code)
+        graph_html = pio.to_html(
+            fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
+        return HTMLResponse(content=f"{graph_html}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the population_mah_plot plot.",
+        )
 
 
 @app.get("/population_marital_status_plot")
 async def get_population_marital_plot(
     city_code: int = Query(1, title="City Code", description="Code of the city"),
 ):
-    fig = population_marital_plot(*dfs_p_marital, city_code)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        return HTMLResponse(content=f"{plots['population_marital_plot'][city_code]}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the population_marital_status_plot plot.",
+        )
 
 
 @app.get("/population_origin_city_plot")
@@ -241,11 +334,16 @@ async def get_population_origin_city_plot(
         800, title="Plot Height in Px", description="Height of the plot"
     ),
 ):
-    fig = population_origin_city_plot(df_origin_city, city_code, height=height)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        return HTMLResponse(
+            content=f"{plots['population_origin_city_plot'][city_code]}"
+        )
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the population_origin_city_plot plot.",
+        )
 
 
 @app.get("/population_trend_plot")
@@ -255,11 +353,14 @@ async def get_population_trend_plot(
         800, title="Plot Height in Px", description="Height of the plot"
     ),
 ):
-    fig = population_trend_plot(df_trend, city_code, height=height)
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        return HTMLResponse(content=f"{plots['population_trend_plot'][city_code]}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the population_trend_plot plot.",
+        )
 
 
 @app.get("/population_election_plot")
@@ -270,13 +371,20 @@ async def get_population_election_plot(
         800, title="Plot Height in Px", description="Height of the plot"
     ),
 ):
-    fig = population_election_plot(
-        df_election, city_code, district_code=district_code, height=height
-    )
-    graph_html = pio.to_html(
-        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
-    )
-    return HTMLResponse(content=f"{graph_html}")
+    try:
+        fig = population_election_plot(
+            df_election, city_code, district_code=district_code, height=height
+        )
+        graph_html = pio.to_html(
+            fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
+        return HTMLResponse(content=f"{graph_html}")
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the population_election_plot plot.",
+        )
 
 
 @app.get("/population_map")  # with gender
@@ -296,11 +404,33 @@ async def get_price_age_plot(plot_request: PriceAgePlotRequest):
         )
         return HTMLResponse(content=f"{price_html}{age_html}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating plots: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating price_age_plot plots: {str(e)}"
+        )
 
 
 @app.get("/all")  # with gender
 async def display_all():
+    return HTMLResponse(
+        content=f"""
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script> 
+        {plots['total_sales_foreigners_animate']}<br>
+        {plots['total_sales']}<br>
+        {plots['total_sales_animate']}<br>
+        {plots['total_sales_monthly'][1]}<br>
+        {plots['total_sales_monthly_foreigners'][1]}<br>
+        {plots['population_marital_plot'][1]}<br>
+        {plots['population_origin_city_plot'][1]}<br>
+        {plots['population_trend_plot'][1]}<br>
+        il kayit no	    ilçe kayit no	mahalle kayit no	il adı  ilçe adı    mahalle adı erkek	kadin<br>
+        81	            957	            51224	            DÜZCE	KAYNAŞLI	KARAÇALI	1030	1054<br>
+        {pio.to_html(population_mah_plot(df_p, city_code=81, town_code=957, quarter_code=51224, width=None, height=800), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(price_plot_demo()[0], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(population_election_plot(df_election, city_code=1), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(price_plot_demo()[1], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+
+        """
+    )
     return HTMLResponse(
         content=f"""
         {pio.to_html(total_sales_animate(df_granular), full_html=False, include_plotlyjs="cdn", include_mathjax=False)}<br>
