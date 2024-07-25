@@ -458,6 +458,7 @@ def population_origin_city():
     )
     df_origin_city.columns = df_origin_city.columns.map(lambda x: city_codes[x.lower()])
     df_origin_city.il = df_origin_city.il.map(lambda x: city_codes[x.lower()])
+    df_origin_city.iloc[0, 0] = 0  # Change the first index value to 0
     df_origin_city.set_index("il", inplace=True)
     with pd.ExcelWriter(output_file_path) as writer:
         df_origin_city.to_excel(writer, sheet_name="df_origin_city")
