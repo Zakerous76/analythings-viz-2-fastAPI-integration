@@ -114,14 +114,23 @@ async def get_total_sales(
 ):
     # start_year, end_year = int(interval.split()[0]), int(interval.split()[1])
     fig = total_sales_plot(df_granular, height=height)
-    graph_html = pio.to_html(fig, full_html=False)  # will return a single <div> element
+    graph_html = pio.to_html(
+        fig,
+        full_html=False,
+        include_plotlyjs=False,
+        include_mathjax=False,
+        include_plotlyjs=False,
+        include_mathjax=False,
+    )  # will return a single <div> element
     return HTMLResponse(content=f"{graph_html}")
 
 
 @app.get("/total_sales_animate")
 async def get_total_sales_animate():
     fig = total_sales_animate(df_granular)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -132,7 +141,9 @@ async def get_total_sales_yearly(
     )
 ):
     fig = total_sales_yearly_plot(df_totals_cities, city_code)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -143,7 +154,9 @@ async def get_total_sales_monthly(
     )
 ):
     fig = total_sales_monthly_plot(df_granular_cities, city_code)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -160,14 +173,18 @@ async def create_plot(plot_request: PlotRequest):
     else:
         raise HTTPException(status_code=400, detail="Invalid plot type")
 
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
 @app.get("/total_sales_to_foreigners_animate")
 async def get_total_sales_to_foreigners_animate():
     fig = total_sales_foreigners_animate(df_f_total_aggregated)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -179,7 +196,9 @@ async def get_total_sales_monthly_foreigners(
 ):
     try:
         fig = total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code)
-        graph_html = pio.to_html(fig, full_html=False)
+        graph_html = pio.to_html(
+            fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
         return HTMLResponse(content=f"{graph_html}")
     except Exception as e:
         print(f"Error: {e}")
@@ -198,7 +217,9 @@ async def get_population_mah_plot(
     ),
 ):
     fig = population_mah_plot(df_p, city_code, town_code, quarter_code)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -207,7 +228,9 @@ async def get_population_marital_plot(
     city_code: int = Query(1, title="City Code", description="Code of the city"),
 ):
     fig = population_marital_plot(*dfs_p_marital, city_code)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -219,7 +242,9 @@ async def get_population_origin_city_plot(
     ),
 ):
     fig = population_origin_city_plot(df_origin_city, city_code, height=height)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -231,7 +256,9 @@ async def get_population_trend_plot(
     ),
 ):
     fig = population_trend_plot(df_trend, city_code, height=height)
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -246,7 +273,9 @@ async def get_population_election_plot(
     fig = population_election_plot(
         df_election, city_code, district_code=district_code, height=height
     )
-    graph_html = pio.to_html(fig, full_html=False)
+    graph_html = pio.to_html(
+        fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+    )
     return HTMLResponse(content=f"{graph_html}")
 
 
@@ -259,8 +288,12 @@ async def get_population_map():
 async def get_price_age_plot(plot_request: PriceAgePlotRequest):
     try:
         fig_price, fig_age = price_age_plot(plot_request.result, plot_request.data)
-        price_html = pio.to_html(fig_price, full_html=False)
-        age_html = pio.to_html(fig_age, full_html=False)
+        price_html = pio.to_html(
+            fig_price, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
+        age_html = pio.to_html(
+            fig_age, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
         return HTMLResponse(content=f"{price_html}{age_html}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating plots: {str(e)}")
@@ -270,22 +303,22 @@ async def get_price_age_plot(plot_request: PriceAgePlotRequest):
 async def display_all():
     return HTMLResponse(
         content=f"""
-        {pio.to_html(total_sales_animate(df_granular), full_html=False)}<br>
-        {pio.to_html(total_sales_plot(df_granular), full_html=False)}<br>
-        {pio.to_html(total_sales_yearly_plot(df_totals_cities), full_html=False)}<br>
-        {pio.to_html(total_sales_monthly_plot(df_granular_cities), full_html=False)}<br>
-        {pio.to_html(total_sales_foreigners_animate(df_f_total_aggregated), full_html=False)}<br>
-        {pio.to_html(total_sales_foreigners_plot(df_f_total_aggregated), full_html=False)}<br>
-        {pio.to_html(total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0), full_html=False)}<br>
+        {pio.to_html(total_sales_animate(df_granular), full_html=False, include_plotlyjs="cdn", include_mathjax=False)}<br>
+        {pio.to_html(total_sales_plot(df_granular), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(total_sales_yearly_plot(df_totals_cities), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(total_sales_monthly_plot(df_granular_cities), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(total_sales_foreigners_animate(df_f_total_aggregated), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(total_sales_foreigners_plot(df_f_total_aggregated), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(total_sales_monthly_foreigners_plot(df_f_cities_aggregated, city_code=0), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
         il kayit no	    ilçe kayit no	mahalle kayit no	il adı  ilçe adı    mahalle adı erkek	kadin<br>
         81	            957	            51224	            DÜZCE	KAYNAŞLI	KARAÇALI	1030	1054<br>
-        {pio.to_html(population_mah_plot(df_p, city_code=81, town_code=957, quarter_code=51224, width=None, height=800), full_html=False)}<br>
-        {pio.to_html(price_plot_demo()[0], full_html=False)}<br>
-        {pio.to_html(price_plot_demo()[1], full_html=False)}<br>
-        {pio.to_html(population_marital_plot(*dfs_p_marital, city_code=1), full_html=False)}<br>
-        {pio.to_html(population_origin_city_plot(df_origin_city, city_code=1), full_html=False)}<br>
-        {pio.to_html(population_election_plot(df_election, city_code=1), full_html=False)}<br>
-        {pio.to_html(population_trend_plot(df_trend, city_code=1), full_html=False)}<br>
+        {pio.to_html(population_mah_plot(df_p, city_code=81, town_code=957, quarter_code=51224, width=None, height=800), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(price_plot_demo()[0], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(price_plot_demo()[1], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(population_marital_plot(*dfs_p_marital, city_code=1), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(population_origin_city_plot(df_origin_city, city_code=1), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(population_election_plot(df_election, city_code=1), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_html(population_trend_plot(df_trend, city_code=1), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
 
 
         """
