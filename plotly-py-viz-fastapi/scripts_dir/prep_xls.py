@@ -1,5 +1,7 @@
 import pandas as pd
+import os
 import json
+from scrape_save_weather_data import scrape_and_save_weather_data
 
 pd.set_option("future.no_silent_downcasting", True)
 
@@ -154,8 +156,8 @@ def sales_cities():
             in each month (monthly granularity)
         df_granular_cities (pandas_df): df_granular without the "Total" column
     """
-    input_file_path = "./datasets/İllere göre konut satış sayısı.xls"
-    output_file_path = "./datasets/sales_data.xlsx"
+    input_file_path = "../datasets/İllere göre konut satış sayısı.xls"
+    output_file_path = "../datasets/sales_data.xlsx"
 
     df = pd.read_excel(input_file_path)
     df.rename(
@@ -235,8 +237,8 @@ def sales_cities_foreigners():
             in each month (monthly granularity)
         df_granular_cities (pandas_df): df_granular without the "Total" column
     """
-    input_file_path = "./datasets/İllere göre yabancılara konut satış sayısı.xls"
-    output_file_path = "./datasets/sales_foreigners_data.xlsx"
+    input_file_path = "../datasets/İllere göre yabancılara konut satış sayısı.xls"
+    output_file_path = "../datasets/sales_foreigners_data.xlsx"
 
     df_f = pd.read_excel(input_file_path)
     df_f.rename(columns={"Unnamed: 1": "Şehir"}, inplace=True)
@@ -292,8 +294,8 @@ def sales_cities_foreigners():
 
 
 def population():
-    input_file_path = "./datasets/nüfus.xlsx"
-    output_file_path = "./datasets/population_data.xlsx"
+    input_file_path = "../datasets/nüfus.xlsx"
+    output_file_path = "../datasets/population_data.xlsx"
 
     df_p = pd.read_excel(input_file_path, sheet_name="MAHALLE NÜFUSU", index_col=0)
     cols = [
@@ -350,7 +352,7 @@ def population():
         .reset_index()
     )
 
-    with open("./cities.json", "r", encoding="utf-8") as file:
+    with open("../datasets/jsons/cities.json", "r", encoding="utf-8") as file:
         json_data = file.read()
     reference_data = json.loads(json_data)
 
@@ -386,8 +388,8 @@ def population():
 
 
 def population_marital():
-    input_file_path = "./datasets/il medeni durum ve cinsiyete gore nufus.xls"  # Replace with the correct file path
-    output_file_path = "./datasets/population_marital_data.xlsx"
+    input_file_path = "../datasets/il medeni durum ve cinsiyete gore nufus.xls"  # Replace with the correct file path
+    output_file_path = "../datasets/population_marital_data.xlsx"
 
     df_origin_city = pd.read_excel(input_file_path, header=[0, 1])
 
@@ -449,9 +451,9 @@ def population_marital():
 
 def population_origin_city():
     input_file_path = (
-        "./datasets/ikamet edilen ile gore nufus kutugune kayitli olunan il.xls"
+        "../datasets/ikamet edilen ile gore nufus kutugune kayitli olunan il.xls"
     )
-    output_file_path = "./datasets/population_based_on_origin_city.xlsx"
+    output_file_path = "../datasets/population_based_on_origin_city.xlsx"
     df_origin_city = pd.read_excel(input_file_path)
     df_origin_city.rename(
         columns={"Unnamed: 0": "il", "Toplam\nTotal": "toplam"}, inplace=True
@@ -470,8 +472,8 @@ import openpyxl
 
 def population_trend():
     # Create a DataFrame from the data
-    input_file_path = "./datasets/nüfus artisi.XLSX"
-    output_file_path = "./datasets/population_trend.xlsx"
+    input_file_path = "../datasets/nüfus artisi.XLSX"
+    output_file_path = "../datasets/population_trend.xlsx"
 
     df_trend = pd.read_excel(input_file_path)
     df_trend.rename(
@@ -553,14 +555,11 @@ def population_trend():
         df_trend.to_excel(writer, sheet_name="df_trend")
 
 
-import os
-
-
 def election():
     # Path to the folder containing your Excel files
-    folder_path = "./datasets/secim/"
+    folder_path = "../datasets/secim/"
 
-    output_file_path = "./datasets/election.xlsx"
+    output_file_path = "../datasets/election.xlsx"
     # List to store all dataframes
     dfs_list = []
 
@@ -651,3 +650,14 @@ if __name__ == "__main__":
     population_marital()
     population_origin_city()
     population_trend()
+    scrape_and_save_weather_data()
+
+
+def main():
+    sales_cities()
+    sales_cities_foreigners()
+    population()
+    population_marital()
+    population_origin_city()
+    population_trend()
+    scrape_and_save_weather_data()

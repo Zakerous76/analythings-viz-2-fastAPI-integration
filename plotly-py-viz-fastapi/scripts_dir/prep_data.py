@@ -109,7 +109,7 @@ def sales_cities_df(start_year=2019, end_year=2024):
             in each month (monthly granularity)
         df_granular_cities (pandas_df): df_granular without the "Total" column
     """
-    excel_file_path = "./datasets/sales_data.xlsx"
+    excel_file_path = "../datasets/sales_data.xlsx"
 
     with pd.ExcelFile(excel_file_path) as xls:
         df_totals_total = pd.read_excel(xls, sheet_name="totals_total", index_col=0)
@@ -143,7 +143,7 @@ def sales_cities_foreigners_df(start_year=2019, end_year=2024):
             in each month (monthly granularity)
         df_granular_cities (pandas_df): df_granular without the "Total" column
     """
-    excel_file_path = "./datasets/sales_foreigners_data.xlsx"
+    excel_file_path = "../datasets/sales_foreigners_data.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_f_total_aggregated = pd.read_excel(
             xls, sheet_name="df_f_total_aggregated", index_col=0
@@ -170,7 +170,7 @@ def sales_cities_foreigners_df(start_year=2019, end_year=2024):
 
 
 def population_df():
-    excel_file_path = "./datasets/population_data.xlsx"
+    excel_file_path = "../datasets/population_data.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_p = pd.read_excel(xls, sheet_name="df_p", index_col=0)
 
@@ -178,7 +178,7 @@ def population_df():
 
 
 def population_marital_df():
-    excel_file_path = "./datasets/population_marital_data.xlsx"
+    excel_file_path = "../datasets/population_marital_data.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_never_married = pd.read_excel(
             xls, sheet_name="df_never_married", index_col=0
@@ -190,21 +190,27 @@ def population_marital_df():
 
 
 def population_origin_city_df():
-    excel_file_path = "./datasets/population_based_on_origin_city.xlsx"
+    excel_file_path = "../datasets/population_based_on_origin_city.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_origin_city = pd.read_excel(xls, sheet_name="df_origin_city", index_col=0)
     return df_origin_city
 
 
 def population_trend_df():
-    excel_file_path = "./datasets/population_trend.xlsx"
+    excel_file_path = "../datasets/population_trend.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_trend = pd.read_excel(xls, sheet_name="df_trend", index_col=0)
     return df_trend
 
 
 def election_df():
-    excel_file_path = "./datasets/election.xlsx"
+    excel_file_path = "../datasets/election.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_election = pd.read_excel(xls, sheet_name="df_election", index_col=0)
     return df_election
+
+
+def weather_df():
+    file_path = "../datasets/weather_data.csv"
+    weather_df = pd.read_csv(file_path)
+    return weather_df

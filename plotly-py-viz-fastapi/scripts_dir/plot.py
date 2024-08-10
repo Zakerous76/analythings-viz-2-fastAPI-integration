@@ -957,6 +957,8 @@ def population_mah_plot(
     title = ""
     fig = go.Figure()
 
+    values1 = df_p[["erkek", "kadin"]].sum().to_list()
+
     if city_code == 0 and town_code == 0 and quarter_code == 0:
         title = "Bütün Ülke"
         values1 = df_p[["erkek", "kadin"]].sum().to_list()

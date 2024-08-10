@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from pydantic import BaseModel
 import plotly.io as pio
-from scripts_dir.prep_data import *
-from scripts_dir.plot import *
+from prep_data import *
+from plot import *
 import json
 
 app = FastAPI()
@@ -70,66 +70,38 @@ def create_html_form_pop(label, action, input_names):
 @app.on_event("startup")
 async def startup():
     global plots
-    plots["total_sales"] = pio.to_json(
-        total_sales_plot(df_granular),
-        engine="json",
-    )
-    plots["total_sales_animate"] = pio.to_json(
-        total_sales_animate(df_granular),
-        engine="json",
-    )
-    plots["total_sales_animate"] = pio.to_json(
-        total_sales_animate(df_granular),
-        engine="json",
-    )
-
-    plots["total_sales_foreigners_animate"] = pio.to_json(
-        total_sales_foreigners_animate(df_f_total_aggregated),
-        engine="json",
-    )
-
-    # total_sales_montly (per city)
-    # total_sales_montly_foreigners (per city)
-    # population_origin_city_plot (per city)
-    # population_marital_plot (per city)
-    # population_trend_plot (per city)
-
+    plots["total_sales"] = total_sales_plot(df_granular).to_plotly_json()
+    plots["total_sales_animate"] = total_sales_animate(df_granular).to_plotly_json()
+    plots["total_sales_foreigners_animate"] = total_sales_foreigners_animate(
+        df_f_total_aggregated
+    ).to_plotly_json()
     plots["total_sales_monthly"] = []
+
     for i in range(0, 82):
         plots["total_sales_monthly"].append(
-            pio.to_json(
-                total_sales_monthly_plot(df_granular_cities, city_code=i), engine="json"
-            )
+            total_sales_monthly_plot(df_granular_cities, city_code=i).to_plotly_json()
         )
-
     plots["total_sales_monthly_foreigners"] = []
     for i in range(0, 82):
         plots["total_sales_monthly_foreigners"].append(
-            pio.to_json(
-                total_sales_monthly_foreigners_plot(
-                    df_f_cities_aggregated, city_code=i
-                ),
-                engine="json",
-            )
+            total_sales_monthly_foreigners_plot(
+                df_f_cities_aggregated, city_code=i
+            ).to_plotly_json()
         )
     plots["population_origin_city_plot"] = []
     for i in range(0, 82):
         plots["population_origin_city_plot"].append(
-            pio.to_json(
-                population_origin_city_plot(df_origin_city, city_code=i), engine="json"
-            )
+            population_origin_city_plot(df_origin_city, city_code=i).to_plotly_json()
         )
     plots["population_marital_plot"] = []
     for i in range(0, 82):
         plots["population_marital_plot"].append(
-            pio.to_json(
-                population_marital_plot(*dfs_p_marital, city_code=i), engine="json"
-            )
+            population_marital_plot(*dfs_p_marital, city_code=i).to_plotly_json()
         )
     plots["population_trend_plot"] = []
     for i in range(0, 82):
         plots["population_trend_plot"].append(
-            pio.to_json(population_trend_plot(df_trend, city_code=i), engine="json")
+            population_trend_plot(df_trend, city_code=i).to_plotly_json()
         )
 
 
@@ -184,7 +156,7 @@ async def get_home():
     )
 
 
-@app.get("/total_sales", response_class=JSONResponse)
+@app.get("/total_sales")
 async def get_total_sales(
     # interval: str = Query(None, title="Interval", description="Write the interval (ex: 2015 2021)"),
     # height: int = Query(800, description="height of the plot"),
@@ -199,7 +171,7 @@ async def get_total_sales(
         )
 
 
-@app.get("/total_sales_animate", response_class=JSONResponse)
+@app.get("/total_sales_animate")
 async def get_total_sales_animate():
     try:
         return JSONResponse(content=plots["total_sales_animate"])
@@ -211,7 +183,7 @@ async def get_total_sales_animate():
         )
 
 
-@app.get("/total_sales_yearly/", response_class=JSONResponse)
+@app.get("/total_sales_yearly/")
 async def get_total_sales_yearly(
     city_code: int = Query(
         0, title="City Code", description="Enter the city code (ex: Ankara is 6)"
@@ -219,8 +191,7 @@ async def get_total_sales_yearly(
 ):
     try:
         fig = total_sales_yearly_plot(df_totals_cities, city_code)
-        graph_html = pio.to_json(fig)
-        return JSONResponse(content=graph_html)
+        return JSONResponse(content=fig.to_plotly_json())
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
@@ -229,7 +200,7 @@ async def get_total_sales_yearly(
         )
 
 
-@app.get("/total_sales_monthly/", response_class=JSONResponse)
+@app.get("/total_sales_monthly/")
 async def get_total_sales_monthly(
     city_code: int = Query(
         0, title="City Code", description="Enter the city code (ex: Ankara is 6)"
@@ -245,10 +216,10 @@ async def get_total_sales_monthly(
         )
 
 
-@app.get("/total_sales_to_foreigners_animate", response_class=JSONResponse)
+@app.get("/total_sales_to_foreigners_animate")
 async def get_total_sales_to_foreigners_animate():
     try:
-        return JSONResponse(content=plots["total_sales_foreigners_animate"])
+        return JSONResponse(content=f"{plots['total_sales_foreigners_animate']}")
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
@@ -274,7 +245,7 @@ async def get_total_sales_monthly_foreigners(
 
 
 # how to get more than parameters
-@app.get("/population_mah_plot", response_class=JSONResponse)
+@app.get("/population_mah_plot")
 async def get_population_mah_plot(
     city_code: int = Query(0, title="City Code", description="Code of the city"),
     town_code: int = Query(0, title="Town Code", description="Code of the town"),
@@ -284,7 +255,9 @@ async def get_population_mah_plot(
 ):
     try:
         fig = population_mah_plot(df_p, city_code, town_code, quarter_code)
-        graph_html = pio.to_json(fig)
+        graph_html = pio.to_json(
+            fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
         return JSONResponse(content=graph_html)
     except Exception as e:
         print(f"Error: {e}")
@@ -294,12 +267,12 @@ async def get_population_mah_plot(
         )
 
 
-@app.get("/population_marital_status_plot", response_class=JSONResponse)
+@app.get("/population_marital_status_plot")
 async def get_population_marital_plot(
     city_code: int = Query(1, title="City Code", description="Code of the city"),
 ):
     try:
-        return JSONResponse(content=plots["population_marital_plot"][city_code])
+        return JSONResponse(content=f"{plots['population_marital_plot'][city_code]}")
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
@@ -308,7 +281,7 @@ async def get_population_marital_plot(
         )
 
 
-@app.get("/population_origin_city_plot", response_class=JSONResponse)
+@app.get("/population_origin_city_plot")
 async def get_population_origin_city_plot(
     city_code: int = Query(1, title="City Code", description="Code of the city"),
     height: int = Query(
@@ -316,7 +289,9 @@ async def get_population_origin_city_plot(
     ),
 ):
     try:
-        return JSONResponse(content=plots["population_origin_city_plot"][city_code])
+        return JSONResponse(
+            content=f"{plots['population_origin_city_plot'][city_code]}"
+        )
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
@@ -325,7 +300,7 @@ async def get_population_origin_city_plot(
         )
 
 
-@app.get("/population_trend_plot", response_class=JSONResponse)
+@app.get("/population_trend_plot")
 async def get_population_trend_plot(
     city_code: int = Query(1, title="City Code", description="Code of the city"),
     height: int = Query(
@@ -333,7 +308,7 @@ async def get_population_trend_plot(
     ),
 ):
     try:
-        return JSONResponse(content=plots["population_trend_plot"][city_code])
+        return JSONResponse(content=f"{plots['population_trend_plot'][city_code]}")
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
@@ -342,7 +317,7 @@ async def get_population_trend_plot(
         )
 
 
-@app.get("/population_election_plot", response_class=JSONResponse)
+@app.get("/population_election_plot")
 async def get_population_election_plot(
     city_code: int = Query(1, title="City Code", description="Code of the city"),
     district_code: int = Query(None, title="City Code", description="Code of the city"),
@@ -354,8 +329,10 @@ async def get_population_election_plot(
         fig = population_election_plot(
             df_election, city_code, district_code=district_code, height=height
         )
-        graph_html = pio.to_json(fig)
-        return JSONResponse(content=graph_html)
+        graph_html = pio.to_json(
+            fig, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
+        return JSONResponse(content=f"{graph_html}")
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(
@@ -373,9 +350,13 @@ async def get_population_map():
 async def get_price_age_plot(plot_request: PriceAgePlotRequest):
     try:
         fig_price, fig_age = price_age_plot(plot_request.result, plot_request.data)
-        price_html = pio.to_json(fig_price)
-        age_html = pio.to_json(fig_age)
-        return JSONResponse(content={"price_plot": price_html, "age_plot": age_html})
+        price_html = pio.to_json(
+            fig_price, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
+        age_html = pio.to_json(
+            fig_age, full_html=False, include_plotlyjs=False, include_mathjax=False
+        )
+        return HTMLResponse(content=f"{price_html}{age_html}")
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Error generating price_age_plot plots: {str(e)}"
@@ -397,11 +378,10 @@ async def display_all():
         {plots['population_trend_plot'][1]}<br>
         il kayit no	    ilçe kayit no	mahalle kayit no	il adı  ilçe adı    mahalle adı erkek	kadin<br>
         81	            957	            51224	            DÜZCE	KAYNAŞLI	KARAÇALI	1030	1054<br>
-        {pio.to_html(population_mah_plot(df_p, city_code=81, town_code=957, quarter_code=51224, width=None, height=800), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
-        {pio.to_html(price_plot_demo()[0], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
-        {pio.to_html(population_election_plot(df_election, city_code=1), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
-        {pio.to_html(price_plot_demo()[1], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
-        {pio.to_json(price_plot_demo()[1])}<br>
+        {pio.to_json(population_mah_plot(df_p, city_code=81, town_code=957, quarter_code=51224, width=None, height=800), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_json(price_plot_demo()[0], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_json(population_election_plot(df_election, city_code=1), full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
+        {pio.to_json(price_plot_demo()[1], full_html=False, include_plotlyjs=False, include_mathjax=False)}<br>
 
         """
     )
