@@ -1,7 +1,11 @@
+"""
+This Python script is designed to process and analyze various datasets related to sales, population, and weather in Turkey.
+The code includes function definitions for reading and processing data from Excel and CSV files, as well as data processing tasks.
+"""
+
 import pandas as pd
 
 pd.set_option("future.no_silent_downcasting", True)
-
 
 city_codes = {
     "yıl": "Yıl",
@@ -95,20 +99,7 @@ city_codes = {key.lower(): value for key, value in city_codes.items()}
 
 
 def sales_cities_df(start_year=2019, end_year=2024):
-    """
-    This function returns the number of real estates sold according in each city (İl)
 
-    params:
-        start_year (int): the starting year for the total number of real estates sold in the country
-        end_year (int): the ending year for the total number of real estates sold in the country
-
-    returns:
-        df_totals_total (pandas_df): Total number of real estates sold in the country
-        df_totals_cities (pandas_df): Total number of real estates sold in each city
-        df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
-            in each month (monthly granularity)
-        df_granular_cities (pandas_df): df_granular without the "Total" column
-    """
     excel_file_path = "../datasets/sales_data.xlsx"
 
     with pd.ExcelFile(excel_file_path) as xls:
@@ -129,20 +120,6 @@ def sales_cities_df(start_year=2019, end_year=2024):
 
 
 def sales_cities_foreigners_df(start_year=2019, end_year=2024):
-    """
-    This function returns the number of real estates sold to foreigners in each city (İl)
-
-    params:
-        start_year (int): the starting year for the total number of sales in the country
-        end_year (int): the ending year for the total number of sales in the country
-
-    returns:
-        df_totals_total (pandas_df): Total number of real estates sold in the country
-        df_totals_cities (pandas_df): Total number of real estates sold in each city
-        df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
-            in each month (monthly granularity)
-        df_granular_cities (pandas_df): df_granular without the "Total" column
-    """
     excel_file_path = "../datasets/sales_foreigners_data.xlsx"
     with pd.ExcelFile(excel_file_path) as xls:
         df_f_total_aggregated = pd.read_excel(

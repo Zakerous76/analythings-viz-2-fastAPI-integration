@@ -1,3 +1,8 @@
+"""
+This is a FASTAPI application that provides endpoints for retrieving sales data, population data, and weather data in JSON format.
+The JSON data is then converted to plots at the other end, which is the back-end for the web application.
+"""
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +22,8 @@ app.add_middleware(
     allow_methods=["*"],  # Adjust this to allow specific methods
     allow_headers=["*"],  # Adjust this to allow specific headers
 )
+
+# These are for caching
 df_totals_total, df_totals_cities, df_granular, df_granular_cities = sales_cities_df()
 df_f_total_aggregated, df_f_cities_aggregated = sales_cities_foreigners_df()
 df_p = population_df()
@@ -24,6 +31,7 @@ dfs_p_marital = population_marital_df()
 df_trend = population_trend_df()
 df_election = election_df()
 df_origin_city = population_origin_city_df()
+df_weather = weather_df()
 
 plots = {}
 
@@ -67,6 +75,7 @@ def create_html_form_pop(label, action, input_names):
     return form_html
 
 
+# To create and cache plots
 @app.on_event("startup")
 async def startup():
     global plots
@@ -133,7 +142,6 @@ async def startup():
         )
 
 
-# Create an endpoint
 @app.get("/", response_class=HTMLResponse)
 async def get_home():
     html_content = """
@@ -364,9 +372,22 @@ async def get_population_election_plot(
         )
 
 
-@app.get("/population_map")  # with gender
-async def get_population_map():
-    pass
+@app.get("/weather_plot", response_class=JSONResponse)
+async def get_weather_plot(
+    city_code: int = Query(1, title="City Code", description="Code of the city"),
+):
+    try:
+        fig = weather_plot(
+            df_election, city_code, district_code=district_code, height=height
+        )
+        graph_html = pio.to_json(fig)
+        return JSONResponse(content=graph_html)
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while generating the weather_plot plot.",
+        )
 
 
 @app.post("/price_age_plot", response_class=JSONResponse)

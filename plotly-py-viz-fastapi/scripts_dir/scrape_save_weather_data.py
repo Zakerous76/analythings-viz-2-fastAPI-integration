@@ -28,6 +28,17 @@ def export_to_csv(save_path, df):
 
 
 def scrape_city_data(city, city_code):
+    """
+    This function scrapes weather data for a given city from a specific URL and returns a pandas DataFrame.
+
+    Parameters:
+    city (str): The name of the city for which weather data needs to be scraped.
+    city_code (int): The code of the city.
+
+    Returns:
+    pandas.DataFrame: A DataFrame containing the scraped weather data for the given city.
+                      If no data is found for the city, the function returns None.
+    """
     global cities_tr
     url = f"https://www.mgm.gov.tr/veridegerlendirme/il-ve-ilceler-istatistik.aspx?m={city}"
     response = requests.get(url)
@@ -63,13 +74,23 @@ def scrape_city_data(city, city_code):
     df.iloc[:, 1:] = df.iloc[:, 1:].astype(float)
     # Create a column and insert it at first position. This column will hold the city code
     df.insert(0, "il", cities_tr[city_code - 1])
+
     df.insert(0, "il kodu", city_code)
 
     return df
 
 
 def scrape_and_save_weather_data():
+    """
+    This function scrapes weather data for all cities listed in the 'cities' list from the specified URL,
+    processes the data, and saves it to a CSV file.
 
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     not_found_cities = []
     city_data_list = []
     # Example usage

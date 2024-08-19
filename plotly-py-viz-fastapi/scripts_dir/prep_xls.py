@@ -1,10 +1,30 @@
 import pandas as pd
 import os
+import openpyxl
 import json
+
 from scrape_save_weather_data import scrape_and_save_weather_data
+from prep_data import population_df
+
 
 pd.set_option("future.no_silent_downcasting", True)
 
+turkish_to_english = {
+    "ç": "c",
+    "ğ": "g",
+    "ı": "i",
+    "ö": "o",
+    "ş": "s",
+    "ü": "u",
+    "i̇": "i",
+    "Ç": "C",
+    "Ğ": "G",
+    "İ": "I",
+    "Ö": "O",
+    "Ş": "S",
+    "Ü": "U",
+    ".": "",
+}
 city_codes = {
     "yıl": "Yıl",
     "ay": "Ay",
@@ -101,6 +121,18 @@ city_codes = {key.lower(): value for key, value in city_codes.items()}
 
 # Helper function to find the IDs from the reference data
 def find_ids(reference_data, city_name, town_name=None, quarter_name=None):
+    """
+    This function finds the IDs of a city, town, and quarter based on their names.
+
+    Parameters:
+    reference_data (list): A list of dictionaries representing the reference data.
+    city_name (str): The name of the city.
+    town_name (str, optional): The name of the town. Defaults to None.
+    quarter_name (str, optional): The name of the quarter. Defaults to None.
+
+    Returns:
+    tuple: A tuple containing the IDs of the city, town, and quarter. If any of them are not found, their respective ID will be None.
+    """
     city_id, town_id, quarter_id = None, None, None
     for city in reference_data:
         if city["name"] == city_name:
@@ -117,24 +149,6 @@ def find_ids(reference_data, city_name, town_name=None, quarter_name=None):
     return city_id, town_id, quarter_id
 
 
-turkish_to_english = {
-    "ç": "c",
-    "ğ": "g",
-    "ı": "i",
-    "ö": "o",
-    "ş": "s",
-    "ü": "u",
-    "i̇": "i",
-    "Ç": "C",
-    "Ğ": "G",
-    "İ": "I",
-    "Ö": "O",
-    "Ş": "S",
-    "Ü": "U",
-    ".": "",
-}
-
-
 def replace_turkish_chars(text):
     text = text.lower()
     for turkish_char, english_char in turkish_to_english.items():
@@ -144,18 +158,15 @@ def replace_turkish_chars(text):
 
 def sales_cities():
     """
-    This function cleans the "İllere göre konut satış sayısı.xls" data and creates a new excel file.
+    This function reads data from an Excel file, processes it, and saves the processed data into separate DataFrames.
 
-    params:
+    Parameters:
+    None
 
-
-    Excel file saved at [excel_file_path] with the following sheets:
-        df_totals_total (pandas_df): Total number of real estates sold in the country
-        df_totals_cities (pandas_df): Total number of real estates sold in each city
-        df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
-            in each month (monthly granularity)
-        df_granular_cities (pandas_df): df_granular without the "Total" column
+    Returns:
+    None. The function saves the processed data into separate DataFrames and saves them to an Excel file.
     """
+
     input_file_path = "../datasets/İllere göre konut satış sayısı.xls"
     output_file_path = "../datasets/sales_data.xlsx"
 
@@ -224,18 +235,14 @@ def sales_cities():
 
 def sales_cities_foreigners():
     """
-    This function returns the number of real estates sold to foreigners in each city (İl)
+    This function reads data from an Excel file containing foreigner housing sales data by city,
+    processes the data, and writes the processed data to a new Excel file.
 
-    params:
-        start_year (int): the starting year for the total number of sales in the country
-        end_year (int): the ending year for the total number of sales in the country
+    Parameters:
+    None
 
-    returns:
-        df_totals_total (pandas_df): Total number of real estates sold in the country
-        df_totals_cities (pandas_df): Total number of real estates sold in each city
-        df_granular (pandas_df): Number of real estates sold in the country in total a between [start_year, end_year] and in each city
-            in each month (monthly granularity)
-        df_granular_cities (pandas_df): df_granular without the "Total" column
+    Returns:
+    None
     """
     input_file_path = "../datasets/İllere göre yabancılara konut satış sayısı.xls"
     output_file_path = "../datasets/sales_foreigners_data.xlsx"
@@ -294,6 +301,17 @@ def sales_cities_foreigners():
 
 
 def population():
+    """
+    This function reads data from an Excel file containing population information,
+    performs data cleaning and transformation, and updates the DataFrame with IDs.
+    The final DataFrame is then saved to a new Excel file.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     input_file_path = "../datasets/nüfus.xlsx"
     output_file_path = "../datasets/population_data.xlsx"
 
@@ -388,6 +406,16 @@ def population():
 
 
 def population_marital():
+    """
+    This function reads data from an Excel file containing population statistics by marital status and gender.
+    It cleans and prepares the data, and saves the processed data into separate sheets in a new Excel file.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     input_file_path = "../datasets/il medeni durum ve cinsiyete gore nufus.xls"  # Replace with the correct file path
     output_file_path = "../datasets/population_marital_data.xlsx"
 
@@ -450,6 +478,16 @@ def population_marital():
 
 
 def population_origin_city():
+    """
+    The function reads data from the input file path, renames the columns, maps the city names to their corresponding IDs,
+    sets the index to the city names, and saves the processed data into a new Excel file at the output file path.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     input_file_path = (
         "../datasets/ikamet edilen ile gore nufus kutugune kayitli olunan il.xls"
     )
@@ -466,11 +504,17 @@ def population_origin_city():
         df_origin_city.to_excel(writer, sheet_name="df_origin_city")
 
 
-from prep_data import population_df
-import openpyxl
-
-
 def population_trend():
+    """
+    This function reads data from an Excel file, cleans and transforms it, and merges it with a population DataFrame.
+    It then fills missing IDs with -2, selects and reorders the columns, and saves the final DataFrame to an Excel file.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     # Create a DataFrame from the data
     input_file_path = "../datasets/nüfus artisi.XLSX"
     output_file_path = "../datasets/population_trend.xlsx"
@@ -556,6 +600,17 @@ def population_trend():
 
 
 def election():
+    """
+    This function reads election data from Excel files in a specified folder, cleans and transforms the data,
+    and merges it with a population DataFrame for relevancy. It then fills missing IDs with -2, selects and reorders the columns,
+    and saves the final DataFrame to an Excel file.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     # Path to the folder containing your Excel files
     folder_path = "../datasets/secim/"
 

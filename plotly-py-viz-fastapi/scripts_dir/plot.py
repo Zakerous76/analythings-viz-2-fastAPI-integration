@@ -5,12 +5,12 @@ import pandas as pd
 import scipy.stats as stats
 import numpy as np
 
+# Define design variables
 font_family = "Verdana"
 label_font_size = 25
 line_width = 5
 marker_size = 12
 color_sequence = px.colors.qualitative.Set3
-
 
 teal_like = "#233d4d"
 orange_like = "orange"
@@ -39,6 +39,7 @@ design = dict(
 )
 
 
+# Function for generating design for the anmiation-based plots
 def design_animate(x_min, x_max, y_min, y_max):
     return dict(
         title_font=dict(size=30, family=font_family, weight="bold", color="black"),
@@ -77,6 +78,7 @@ def design_animate(x_min, x_max, y_min, y_max):
     )
 
 
+# Map for city codes to their names
 city_code_map = {
     0: "ÜLKE",
     1: "ADANA",
@@ -166,7 +168,17 @@ city_code_f = [48, 33, 35, 16, 99, 9, 7, 54, 6, 34, 77, 61, 55, 41]
 
 
 def total_sales_animate(df_granular, width=None, height=800):
+    """
+    Create an animated plot to visualize the total sales of houses in Turkey over time.
 
+    Parameters:
+    df_granular (pandas.DataFrame): A DataFrame containing the necessary data for the plot. It should have a datetime index and a column named "Total" representing the total sales of houses.
+    width (int, optional): The width of the plot in pixels. If not provided, the width will be determined by the plot layout.
+    height (int, optional): The height of the plot in pixels. If not provided, the height will be determined by the plot layout.
+
+    Returns:
+    go.Figure: A Figure object representing the animated plot. This object can be used to display the plot in a Jupyter notebook or save it as an HTML file.
+    """
     # df_granular is your DataFrame and has the necessary data
     # Calculate the min and max values for the x and y axis
     x_min = df_granular.index.min() - pd.Timedelta(days=2)
