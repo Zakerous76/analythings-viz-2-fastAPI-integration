@@ -1,11 +1,11 @@
 
-# 🏠 Real Estate Dashboard (FastAPI + Plotly)
+# 🏠 Real Estate Dashboard Plot API (FastAPI + Plotly)
 
-This project is a **FastAPI web application** that serves **interactive Plotly charts** for real estate sales, population, and weather data.
-All plots are rendered as **self-contained HTML**, so they can be viewed directly in the browser without extra frontend code.
+This project is a **FastAPI web application** that provides **interactive Plotly charts** for real estate sales, population statistics, and weather data.
+All charts are served as **self-contained HTML**, allowing them to be viewed directly in the browser without any additional frontend setup.
+Optionally, the application can be easily adapted to serve **JSON data** for integration with custom frontend frameworks or dashboards.
 
 ---
-
 
 ![project-9](https://github.com/user-attachments/assets/f4144d0e-2758-453d-8965-bc87f0a3fc57)
 
@@ -43,12 +43,16 @@ All plots are rendered as **self-contained HTML**, so they can be viewed directl
 
 ## ⚡ Tech Stack
 
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge\&logo=python\&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge\&logo=fastapi\&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge\&logo=plotly\&logoColor=white)](https://plotly.com/python/)
 [![Uvicorn](https://img.shields.io/badge/Uvicorn-262261?style=for-the-badge\&logo=uvicorn\&logoColor=white)](https://www.uvicorn.org/)
 [![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge\&logo=pandas\&logoColor=white)](https://pandas.pydata.org/)
 [![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge\&logo=numpy\&logoColor=white)](https://numpy.org/)
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge\&logo=python\&logoColor=white)](https://www.python.org/)
+[![SciPy](https://img.shields.io/badge/SciPy-8CA0D7?style=for-the-badge&logo=scipy&logoColor=white)](https://www.scipy.org/)  
+[![Requests](https://img.shields.io/badge/Requests-008ABC?style=for-the-badge&logo=requests&logoColor=white)](https://docs.python-requests.org/)  
+[![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-FF9900?style=for-the-badge&logo=beautifulsoup&logoColor=white)](https://www.crummy.com/software/BeautifulSoup/)
+
 
 
 ## 🚀 Getting Started
