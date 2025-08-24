@@ -120,13 +120,6 @@ Go to:
 
 ---
 
-## 📸 Screenshots
-
-
-<img width="1920" height="13637" alt="screencapture-127-0-0-1-8000-all-2025-08-24-12_47_47" src="https://github.com/user-attachments/assets/ba018310-05bd-4039-b489-30fdef0e363a" />
-
----
-
 ## 🛠️ Development Notes
 
 * All plots are generated with `plotly.io.to_html()` → no frontend Plotly setup required
