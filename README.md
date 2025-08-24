@@ -48,10 +48,7 @@ Optionally, the application can be easily adapted to serve **JSON data** for int
 [![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge\&logo=plotly\&logoColor=white)](https://plotly.com/python/)
 [![Uvicorn](https://img.shields.io/badge/Uvicorn-262261?style=for-the-badge\&logo=uvicorn\&logoColor=white)](https://www.uvicorn.org/)
 [![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge\&logo=pandas\&logoColor=white)](https://pandas.pydata.org/)
-[![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge\&logo=numpy\&logoColor=white)](https://numpy.org/)
-[![SciPy](https://img.shields.io/badge/SciPy-8CA0D7?style=for-the-badge&logo=scipy&logoColor=white)](https://www.scipy.org/)  
-[![Requests](https://img.shields.io/badge/Requests-008ABC?style=for-the-badge&logo=requests&logoColor=white)](https://docs.python-requests.org/)  
-[![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-FF9900?style=for-the-badge&logo=beautifulsoup&logoColor=white)](https://www.crummy.com/software/BeautifulSoup/)
+[![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge\&logo=numpy\&logoColor=white)](https://numpy.org/) [![SciPy](https://img.shields.io/badge/SciPy-8CA0D7?style=for-the-badge&logo=scipy&logoColor=white)](https://www.scipy.org/) [![Requests](https://img.shields.io/badge/Requests-008ABC?style=for-the-badge&logo=requests&logoColor=white)](https://docs.python-requests.org/) [![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-FF9900?style=for-the-badge&logo=beautifulsoup&logoColor=white)](https://www.crummy.com/software/BeautifulSoup/)
 
 
 
